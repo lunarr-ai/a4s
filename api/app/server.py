@@ -151,6 +151,194 @@ async def search_agents(
     ]
 
 
+@mcp.tool()
+async def get_skills(
+    names: list[str],
+    ctx: Context[ServerSession, AppContext],
+) -> list[dict]:
+    """Get metadata for specific skills by name.
+
+    Args:
+        names: List of skill names to retrieve.
+
+    Returns:
+        List of skill metadata for the requested names.
+    """
+    skills_registry = ctx.request_context.lifespan_context.skills_registry
+    results = []
+    for name in names:
+        try:
+            skill = await skills_registry.get_skill_by_name(name)
+            results.append({"name": skill.name, "description": skill.description})
+        except skills_exc.SkillNotFoundError:
+            results.append({"name": name, "error": f"Skill '{name}' not found"})
+    return results
+
+
+@mcp.tool()
+async def search_skills(
+    query: str,
+    ctx: Context[ServerSession, AppContext],
+    limit: int = 5,
+) -> list[dict]:
+    """Search for skills using semantic search.
+
+    Args:
+        query: Natural language query to find relevant skills.
+        limit: Maximum number of results to return.
+
+    Returns:
+        List of skills matching the query, ordered by relevance.
+    """
+    skills_registry = ctx.request_context.lifespan_context.skills_registry
+    skills = await skills_registry.search_skills(query, limit)
+    return [{"name": skill.name, "description": skill.description} for skill in skills]
+
+
+@mcp.tool()
+async def list_skills(
+    ctx: Context[ServerSession, AppContext],
+    offset: int = 0,
+    limit: int = 50,
+) -> dict:
+    """List all available skills with pagination.
+
+    Args:
+        offset: Number of skills to skip.
+        limit: Maximum number of skills to return (max 100).
+
+    Returns:
+        Dictionary with skills list and pagination info.
+    """
+    limit = min(limit, 100)
+    skills_registry = ctx.request_context.lifespan_context.skills_registry
+    skills = await skills_registry.list_skills_paginated(offset, limit)
+    return {
+        "skills": [{"name": s.name, "description": s.description} for s in skills],
+        "offset": offset,
+        "limit": limit,
+        "count": len(skills),
+    }
+
+
+@mcp.resource("skill://{skill_name}/instructions")
+async def get_skill_instructions(
+    skill_name: str,
+    ctx: Context[ServerSession, AppContext],
+) -> str:
+    """Get the SKILL.md instructions for a skill.
+
+    Returns the full body content of the skill's SKILL.md file,
+    which contains detailed instructions for using the skill.
+    """
+    skills_registry = ctx.request_context.lifespan_context.skills_registry
+    skill = await skills_registry.get_skill_by_name(skill_name)
+    return skill.body
+
+
+@mcp.resource("skill://{skill_name}/file/{path}")
+async def get_skill_file(
+    skill_name: str,
+    path: str,
+    ctx: Context[ServerSession, AppContext],
+) -> bytes:
+    """Get a specific file associated with a skill.
+
+    Returns the content of the specified file from the skill's
+    associated files (scripts, references, assets, etc.).
+    """
+    skills_registry = ctx.request_context.lifespan_context.skills_registry
+    skill = await skills_registry.get_skill_by_name(skill_name)
+    skill_file = await skills_registry.get_skill_file_by_path(skill.id, path)
+    return skill_file.content
+
+
+@mcp.prompt()
+async def activate_skill(
+    skill_name: str,
+    ctx: Context[ServerSession, AppContext],
+) -> str:
+    """Generate instructions for activating and using a specific skill.
+
+    Args:
+        skill_name: Name of the skill to activate.
+
+    Returns:
+        Formatted prompt with skill instructions.
+    """
+    skills_registry = ctx.request_context.lifespan_context.skills_registry
+
+    try:
+        skill = await skills_registry.get_skill_by_name(skill_name)
+    except skills_exc.SkillNotFoundError:
+        return f"Error: Skill '{skill_name}' not found. Use search_skills or list_skills to find available skills."
+
+    parts = [f"# Skill: {skill.name}", "", "## Description", skill.description, ""]
+
+    if skill.compatibility:
+        parts.extend(["## Compatibility", skill.compatibility, ""])
+
+    if skill.allowed_tools:
+        parts.extend(["## Allowed Tools", ", ".join(skill.allowed_tools), ""])
+
+    if skill.body:
+        parts.extend(["## Instructions", skill.body, ""])
+
+    parts.extend(["---", "You are now operating with this skill activated. Follow the instructions above."])
+
+    return "\n".join(parts)
+
+
+@mcp.prompt()
+async def discover_skills(
+    task_description: str,
+    ctx: Context[ServerSession, AppContext],
+    limit: int = 5,
+) -> str:
+    """Find and recommend skills for a given task.
+
+    Args:
+        task_description: Description of the task to accomplish.
+        limit: Maximum number of skills to recommend.
+
+    Returns:
+        Formatted prompt with skill recommendations.
+    """
+    skills_registry = ctx.request_context.lifespan_context.skills_registry
+    skills = await skills_registry.search_skills(task_description, limit)
+
+    if not skills:
+        return (
+            f"No skills found matching: {task_description}\n\n"
+            "Consider using list_skills to browse all available skills."
+        )
+
+    parts = [
+        "# Skill Discovery Results",
+        "",
+        f"Task: {task_description}",
+        "",
+        f"Found {len(skills)} relevant skill(s):",
+        "",
+    ]
+
+    for i, skill in enumerate(skills, 1):
+        parts.extend([f"## {i}. {skill.name}", skill.description, ""])
+        if skill.tags:
+            tags_str = ", ".join(f"{k}={v}" for k, v in skill.tags.items())
+            parts.extend([f"Tags: {tags_str}", ""])
+
+    parts.extend(
+        [
+            "---",
+            "To activate a skill, use the activate_skill prompt with the skill name.",
+            "To get more details, read its instructions: skill://{skill_name}/instructions",
+        ]
+    )
+
+    return "\n".join(parts)
+
+
 # Get the MCP ASGI app and mount it into FastAPI
 mcp_starlette_app = mcp.streamable_http_app()
 mcp_asgi_app = mcp_starlette_app.routes[0].app

@@ -298,6 +298,66 @@ class SqliteSkillsRegistry(SkillsRegistry):
             rows = await cursor.fetchall()
         return [self._row_to_skill(row) for row in rows]
 
+    async def get_skill_by_name(self, name: str) -> Skill:
+        """Get a skill by name.
+
+        Args:
+            name: The unique name of the skill.
+
+        Returns:
+            The skill with the given name.
+
+        Raises:
+            SkillNotFoundError: If the skill does not exist.
+        """
+        async with self._db.execute("SELECT * FROM skill WHERE name = ?", (name,)) as cursor:
+            row = await cursor.fetchone()
+        if not row:
+            logger.error("Skill with name %s not found", name)
+            raise SkillNotFoundError(f"Skill with name '{name}' not found")
+        return self._row_to_skill(row)
+
+    async def get_skill_file_by_path(self, skill_id: int, path: str) -> SkillFile:
+        """Get a specific file associated with a skill by path.
+
+        Args:
+            skill_id: The ID of the skill.
+            path: The file path within the skill.
+
+        Returns:
+            The file at the given path.
+
+        Raises:
+            SkillNotFoundError: If the skill or file does not exist.
+        """
+        await self.get_skill(skill_id)
+        async with self._db.execute(
+            "SELECT * FROM skillfile WHERE skill_id = ? AND path = ?",
+            (skill_id, path),
+        ) as cursor:
+            row = await cursor.fetchone()
+        if not row:
+            logger.error("File %s not found for skill %s", path, skill_id)
+            raise SkillNotFoundError(f"File '{path}' not found for skill {skill_id}")
+        return self._row_to_skill_file(row)
+
+    async def list_skills_paginated(self, offset: int = 0, limit: int = 50) -> list[Skill]:
+        """List skills with pagination.
+
+        Args:
+            offset: Number of skills to skip.
+            limit: Maximum number of skills to return.
+
+        Returns:
+            List of skills starting from offset.
+        """
+        async with self._db.execute(
+            "SELECT * FROM skill ORDER BY name LIMIT ? OFFSET ?",
+            (limit, offset),
+        ) as cursor:
+            rows = await cursor.fetchall()
+        return [self._row_to_skill(row) for row in rows]
+
     async def close(self) -> None:
         """Close the database connection."""
         if self._db:
