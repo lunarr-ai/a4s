@@ -21,9 +21,13 @@ dev = [
     "pytest>=9,<10",
     "pre-commit>=4,<5",
 ]
+docker = [
+    "docker>=7.1.0",
+]
 
 [tool.uv]
 package = true
+default-groups = ["dev", "docker"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["app"]
