@@ -5,6 +5,11 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from app.broker.exceptions import (
+    AgentNotRegisteredError,
+    AgentRegistryError,
+    RegistryConnectionError,
+)
 from app.config import config
 from app.runtime.docker_manager import DockerRuntimeManager
 from app.runtime.exceptions import AgentNotFoundError, AgentSpawnError, ImageNotFoundError
@@ -48,3 +53,18 @@ async def agent_spawn_error_handler(_request: Request, exc: AgentSpawnError) -> 
 @app.exception_handler(ImageNotFoundError)
 async def image_not_found_handler(_request: Request, exc: ImageNotFoundError) -> JSONResponse:
     return JSONResponse(status_code=400, content={"detail": str(exc)})
+
+
+@app.exception_handler(AgentNotRegisteredError)
+async def agent_not_registered_handler(_request: Request, exc: AgentNotRegisteredError) -> JSONResponse:
+    return JSONResponse(status_code=404, content={"detail": str(exc)})
+
+
+@app.exception_handler(RegistryConnectionError)
+async def registry_connection_error_handler(_request: Request, exc: RegistryConnectionError) -> JSONResponse:
+    return JSONResponse(status_code=503, content={"detail": str(exc)})
+
+
+@app.exception_handler(AgentRegistryError)
+async def agent_registry_error_handler(_request: Request, exc: AgentRegistryError) -> JSONResponse:
+    return JSONResponse(status_code=500, content={"detail": str(exc)})
