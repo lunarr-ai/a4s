@@ -11,5 +11,8 @@ class Config(BaseSettings):
 
     embedding_model_id: str = Field(default="all-MiniLM-L6-v2")
 
+    # Skills
+    skills_db_path: str = Field(default="skills.db")
+
 
 config = Config()

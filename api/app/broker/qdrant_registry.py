@@ -7,10 +7,9 @@ from qdrant_client import AsyncQdrantClient
 from qdrant_client.http.exceptions import UnexpectedResponse
 from qdrant_client.models import Distance, PointStruct, VectorParams
 
-from app.broker.exceptions import AgentNotRegisteredError, RegistryConnectionError
-from app.broker.models import EmbeddingModel
+from app.broker.exceptions import AgentNotRegisteredError, AgentRegistryConnectionError
 from app.broker.registry import AgentRegistry
-from app.models import Agent, AgentStatus
+from app.models import Agent, AgentStatus, EmbeddingModel
 
 logger = logging.getLogger(__name__)
 
@@ -85,7 +84,7 @@ class QdrantAgentRegistry(AgentRegistry):
             agent: The agent to register.
 
         Raises:
-            RegistryConnectionError: If the registry is unreachable.
+            AgentRegistryConnectionError: If the registry is unreachable.
         """
         await self._ensure_collection()
         try:
@@ -103,7 +102,7 @@ class QdrantAgentRegistry(AgentRegistry):
             logger.info("Registered agent %s", agent.id)
         except UnexpectedResponse as e:
             logger.error("Failed to register agent %s: %s", agent.id, e)
-            raise RegistryConnectionError(f"Failed to register agent: {e}") from e
+            raise AgentRegistryConnectionError(f"Failed to register agent: {e}") from e
 
     async def unregister_agent(self, agent_id: str) -> None:
         """Unregister an agent from the registry.
