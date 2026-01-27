@@ -37,6 +37,7 @@ class DockerRuntimeManager(RuntimeManager):
         self._network_name = network_name
         self._ensure_network()
 
+    # TODO: uniqueness
     def _container_name(self, name: str) -> str:
         return f"a4s-agent-{name}"
 
