@@ -7,10 +7,9 @@ from qdrant_client import AsyncQdrantClient
 from qdrant_client.http.exceptions import UnexpectedResponse
 from qdrant_client.models import Distance, PointStruct, VectorParams
 
-from app.broker.exceptions import AgentNotRegisteredError, RegistryConnectionError
-from app.broker.models import EmbeddingModel
+from app.broker.exceptions import AgentNotRegisteredError, AgentRegistryConnectionError
 from app.broker.registry import AgentRegistry
-from app.models import Agent, AgentStatus
+from app.models import Agent, AgentStatus, EmbeddingModel
 
 logger = logging.getLogger(__name__)
 
@@ -85,7 +84,7 @@ class QdrantAgentRegistry(AgentRegistry):
             agent: The agent to register.
 
         Raises:
-            RegistryConnectionError: If the registry is unreachable.
+            AgentRegistryConnectionError: If the registry is unreachable.
         """
         await self._ensure_collection()
         try:
@@ -103,7 +102,7 @@ class QdrantAgentRegistry(AgentRegistry):
             logger.info("Registered agent %s", agent.id)
         except UnexpectedResponse as e:
             logger.error("Failed to register agent %s: %s", agent.id, e)
-            raise RegistryConnectionError(f"Failed to register agent: {e}") from e
+            raise AgentRegistryConnectionError(f"Failed to register agent: {e}") from e
 
     async def unregister_agent(self, agent_id: str) -> None:
         """Unregister an agent from the registry.
@@ -143,26 +142,24 @@ class QdrantAgentRegistry(AgentRegistry):
             raise AgentNotRegisteredError(f"Agent {agent_id} not found")
         return self._payload_to_agent(results[0].payload)
 
-    async def list_agents(self) -> list[Agent]:
-        """List all registered agents.
+    async def list_agents(self, offset: int = 0, limit: int = 50) -> list[Agent]:
+        """List agents with pagination.
+
+        Args:
+            offset: Number of agents to skip.
+            limit: Maximum number of agents to return.
 
         Returns:
-            List of all agents in the registry.
+            List of agents starting from offset.
         """
         await self._ensure_collection()
-        agents = []
-        offset = None
-        while True:
-            records, offset = await self._client.scroll(
-                collection_name=self._collection_name,
-                limit=100,
-                offset=offset,
-                with_payload=True,
-            )
-            agents.extend(self._payload_to_agent(r.payload) for r in records)
-            if offset is None:
-                break
-        return agents
+        records, _ = await self._client.scroll(
+            collection_name=self._collection_name,
+            limit=limit,
+            offset=offset,
+            with_payload=True,
+        )
+        return [self._payload_to_agent(r.payload) for r in records]
 
     async def search_agents(self, query: str, limit: int = 10) -> list[Agent]:
         """Search for agents using semantic search.

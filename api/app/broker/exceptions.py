@@ -6,5 +6,5 @@ class AgentNotRegisteredError(AgentRegistryError):
     """Agent not found in registry."""
 
 
-class RegistryConnectionError(AgentRegistryError):
+class AgentRegistryConnectionError(AgentRegistryError):
     """Failed to connect to registry backend."""

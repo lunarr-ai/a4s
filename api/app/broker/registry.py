@@ -19,8 +19,16 @@ class AgentRegistry(ABC):
         """Get an agent."""
 
     @abstractmethod
-    async def list_agents(self) -> list[Agent]:
-        """List all agents."""
+    async def list_agents(self, offset: int = 0, limit: int = 50) -> list[Agent]:
+        """List agents with pagination.
+
+        Args:
+            offset: Number of agents to skip.
+            limit: Maximum number of agents to return.
+
+        Returns:
+            List of agents starting from offset.
+        """
 
     @abstractmethod
     async def search_agents(self, query: str, limit: int = 10) -> list[Agent]:
