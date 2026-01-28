@@ -4,17 +4,19 @@ version = "0.1.0"
 description = "Orchestration system for AI agents."
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = [
-    "api",
-    "a4s-mcp",
-]
+dependencies = []
 
 [dependency-groups]
 dev = [
     "ruff>=0.14,<0.15",
     "pytest>=9,<10",
     "pre-commit>=4,<5",
+    "api",
+    "a4s-mcp",
 ]
+
+[tool.uv]
+default-groups = ["dev"]
 
 [tool.uv.sources]
 api = { workspace = true }

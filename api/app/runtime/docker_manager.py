@@ -15,6 +15,7 @@ from app.runtime.models import SpawnAgentRequest
 logger = logging.getLogger(__name__)
 
 DEFAULT_BASE_URL = "unix:///var/run/docker.sock"
+DEFAULT_API_BASE_URL = "http://host.docker.internal:8000"
 DEFAULT_NETWORK = "a4s-agents"
 LABEL_PREFIX = "a4s"
 CONTAINER_PORT = 8000
@@ -29,13 +30,13 @@ class DockerRuntimeManager(RuntimeManager):
     """
 
     def __init__(
-        self,
-        base_url: str | None = None,
-        network_name: str = DEFAULT_NETWORK,
+        self, base_url: str | None = None, network_name: str = DEFAULT_NETWORK, api_base_url: str = DEFAULT_API_BASE_URL
     ) -> None:
         self._client = DockerClient(base_url=base_url or DEFAULT_BASE_URL)
         self._network_name = network_name
         self._ensure_network()
+
+        self._api_base_url = api_base_url
 
     # TODO: uniqueness
     def _container_name(self, name: str) -> str:
@@ -86,6 +87,7 @@ class DockerRuntimeManager(RuntimeManager):
                 "AGENT_MODEL_ID": request.model.model_id,
                 "AGENT_INSTRUCTION": request.instruction,
                 "AGENT_TOOLS": ",".join(request.tools),
+                "A4S_API_URL": self._api_base_url,
             }
             container = self._client.containers.run(
                 request.image,

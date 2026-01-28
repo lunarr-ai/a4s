@@ -90,7 +90,10 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
         url=config.qdrant_url,
         collection_name=config.registry_qdrant_collection,
     )
-    runtime_manager = DockerRuntimeManager()
+    runtime_manager = DockerRuntimeManager(
+        api_base_url=config.api_base_url,
+        network_name=config.agent_network,
+    )
     skills_registry = await SqliteSkillsRegistry.create(config.skills_db_path)
 
     _app.state.registry = registry
