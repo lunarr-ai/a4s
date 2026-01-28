@@ -1,0 +1,26 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "e2e"
+version = "0.1.0"
+description = "E2E tests for A4S"
+requires-python = ">=3.12"
+dependencies = [
+    "google-adk[a2a]>=1.0.0",
+    "httpx>=0.28",
+    "litellm>=1.0.0",
+    "pydantic-settings>=2.12.0",
+    "uvicorn>=0.32.0",
+    "a4s-mcp",
+]
+
+[tool.uv.sources]
+a4s-mcp = { workspace = true }
+
+[tool.uv]
+package = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["hello_world_agent"]

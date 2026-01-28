@@ -13,6 +13,7 @@ dev = [
     "pre-commit>=4,<5",
     "api",
     "a4s-mcp",
+    "e2e",
 ]
 
 [tool.uv]
@@ -21,11 +22,13 @@ default-groups = ["dev"]
 [tool.uv.sources]
 api = { workspace = true }
 a4s-mcp = { workspace = true }
+e2e = { workspace = true }
 
 [tool.uv.workspace]
 members = [
     "api",
     "mcp",
+    "e2e",
 ]
 
 [tool.pytest.ini_options]
