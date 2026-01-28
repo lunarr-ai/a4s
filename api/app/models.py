@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
-from uuid import UUID
 
 from pydantic import BaseModel, Field
 
@@ -51,7 +50,7 @@ class AgentStatus(str, Enum):
 class Agent(BaseModel):
     """Metadata for an AI agent runtime."""
 
-    id: UUID = Field(description="The unique identifier of the agent.")
+    id: str = Field(description="The unique identifier of the agent.")
     name: str = Field(description="The name of the agent.")
     description: str = Field(description="The description of the agent.")
     version: str = Field(description="The version of the agent.")

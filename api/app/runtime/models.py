@@ -4,6 +4,7 @@ from app.models import AgentModel
 
 
 class SpawnAgentRequest(BaseModel):
+    agent_id: str = Field(description="The unique identifier of the agent.")
     name: str = Field(description="The name of the agent.")
     image: str = Field(description="The docker image of the agent.")
     version: str = Field(description="The version of the agent.", default="1.0.0")

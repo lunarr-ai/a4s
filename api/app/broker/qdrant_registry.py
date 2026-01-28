@@ -1,11 +1,11 @@
 import logging
+import uuid
 from datetime import datetime
-from uuid import UUID
 
 from fastembed import TextEmbedding
 from qdrant_client import AsyncQdrantClient
 from qdrant_client.http.exceptions import UnexpectedResponse
-from qdrant_client.models import Distance, PointStruct, VectorParams
+from qdrant_client.models import Distance, FieldCondition, Filter, MatchValue, PointStruct, VectorParams
 
 from app.broker.exceptions import AgentNotRegisteredError, AgentRegistryConnectionError
 from app.broker.registry import AgentRegistry
@@ -55,7 +55,7 @@ class QdrantAgentRegistry(AgentRegistry):
 
     def _agent_to_payload(self, agent: Agent) -> dict:
         return {
-            "id": str(agent.id),
+            "id": agent.id,
             "name": agent.name,
             "description": agent.description,
             "version": agent.version,
@@ -67,7 +67,7 @@ class QdrantAgentRegistry(AgentRegistry):
 
     def _payload_to_agent(self, payload: dict) -> Agent:
         return Agent(
-            id=UUID(payload["id"]),
+            id=payload["id"],
             name=payload["name"],
             description=payload["description"],
             version=payload["version"],
@@ -90,8 +90,9 @@ class QdrantAgentRegistry(AgentRegistry):
         try:
             document = f"{agent.name} {agent.description}"
             vector = self._embed(document)
+            point_id = str(uuid.uuid4())
             point = PointStruct(
-                id=agent.id,
+                id=point_id,
                 vector=vector,
                 payload=self._agent_to_payload(agent),
             )
@@ -116,7 +117,7 @@ class QdrantAgentRegistry(AgentRegistry):
         await self.get_agent(agent_id)
         await self._client.delete(
             collection_name=self._collection_name,
-            points_selector=[agent_id],
+            points_selector=Filter(must=[FieldCondition(key="id", match=MatchValue(value=agent_id))]),
         )
         logger.info("Unregistered agent %s", agent_id)
 
@@ -132,9 +133,10 @@ class QdrantAgentRegistry(AgentRegistry):
         Raises:
             AgentNotRegisteredError: If the agent does not exist.
         """
-        results = await self._client.retrieve(
+        results, _ = await self._client.scroll(
             collection_name=self._collection_name,
-            ids=[agent_id],
+            scroll_filter=Filter(must=[FieldCondition(key="id", match=MatchValue(value=agent_id))]),
+            limit=1,
             with_payload=True,
         )
         if not results:

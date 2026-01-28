@@ -1,11 +1,11 @@
 from typing import TYPE_CHECKING, Annotated
-from uuid import UUID
 
 from fastapi import APIRouter, Query, Request
 from pydantic import BaseModel, Field
 
 from app.models import Agent, AgentModel, AgentStatus, ModelProvider
 from app.runtime.models import SpawnAgentRequest
+from app.utils import generate_agent_id
 
 if TYPE_CHECKING:
     from app.broker.registry import AgentRegistry
@@ -17,7 +17,6 @@ router = APIRouter(prefix="/agents", tags=["agents"])
 class RegisterAgentRequest(BaseModel):
     """Request body for registering an agent."""
 
-    id: UUID = Field(description="Unique identifier for the agent.")
     name: str = Field(description="Name of the agent.")
     description: str = Field(description="Description of the agent capabilities.")
     version: str = Field(description="Version of the agent.", default="1.0.0")
@@ -72,8 +71,9 @@ async def register_agent(request: Request, body: RegisterAgentRequest) -> Agent:
     """
     registry: AgentRegistry = request.app.state.registry
 
+    agent_id = generate_agent_id(body.name)
     agent = Agent(
-        id=body.id,
+        id=agent_id,
         name=body.name,
         description=body.description,
         version=body.version,
@@ -177,6 +177,7 @@ async def start_agent(request: Request, agent_id: str, body: StartAgentRequest) 
     agent = await registry.get_agent(agent_id)
 
     spawn_request = SpawnAgentRequest(
+        agent_id=agent.id,
         name=agent.name,
         image=body.image,
         version=agent.version,
@@ -191,9 +192,10 @@ async def start_agent(request: Request, agent_id: str, body: StartAgentRequest) 
     )
 
     spawned_agent = runtime_manager.spawn_agent(spawn_request)
-    status = runtime_manager.get_agent_status(str(spawned_agent.id))
+    container_name = f"a4s-agent-{agent.name}"
+    status = runtime_manager.get_agent_status(container_name)
 
-    return AgentStatusResponse(agent_id=str(spawned_agent.id), status=status)
+    return AgentStatusResponse(agent_id=spawned_agent.id, status=status)
 
 
 @router.post("/{agent_id}/stop")
@@ -207,11 +209,15 @@ async def stop_agent(request: Request, agent_id: str) -> AgentStatusResponse:
     Returns:
         Status of the stopped agent.
     """
+    registry: AgentRegistry = request.app.state.registry
     runtime_manager: RuntimeManager = request.app.state.runtime_manager
-    runtime_manager.stop_agent(agent_id)
-    status = runtime_manager.get_agent_status(agent_id)
 
-    return AgentStatusResponse(agent_id=agent_id, status=status)
+    agent = await registry.get_agent(agent_id)
+    container_name = f"a4s-agent-{agent.name}"
+
+    runtime_manager.stop_agent(container_name)
+
+    return AgentStatusResponse(agent_id=agent_id, status=AgentStatus.STOPPED)
 
 
 @router.get("/{agent_id}/status")
@@ -225,7 +231,11 @@ async def get_agent_status(request: Request, agent_id: str) -> AgentStatusRespon
     Returns:
         Current runtime status of the agent.
     """
+    registry: AgentRegistry = request.app.state.registry
     runtime_manager: RuntimeManager = request.app.state.runtime_manager
-    status = runtime_manager.get_agent_status(agent_id)
+
+    agent = await registry.get_agent(agent_id)
+    container_name = f"a4s-agent-{agent.name}"
+    status = runtime_manager.get_agent_status(container_name)
 
     return AgentStatusResponse(agent_id=agent_id, status=status)

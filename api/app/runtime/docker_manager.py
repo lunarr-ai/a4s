@@ -1,4 +1,5 @@
 import logging
+import os
 
 from docker import DockerClient
 from docker.errors import DockerException, ImageNotFound, NotFound
@@ -19,6 +20,7 @@ DEFAULT_API_BASE_URL = "http://host.docker.internal:8000"
 DEFAULT_NETWORK = "a4s-agents"
 LABEL_PREFIX = "a4s"
 CONTAINER_PORT = 8000
+PASSTHROUGH_ENV_KEYS = ("GOOGLE_API_KEY", "OPENAI_API_KEY", "OPENROUTER_API_KEY")
 
 
 class DockerRuntimeManager(RuntimeManager):
@@ -77,6 +79,7 @@ class DockerRuntimeManager(RuntimeManager):
         try:
             labels = {
                 f"{LABEL_PREFIX}.managed": "true",
+                f"{LABEL_PREFIX}.agent_id": request.agent_id,
                 f"{LABEL_PREFIX}.name": request.name,
                 f"{LABEL_PREFIX}.description": request.description,
                 f"{LABEL_PREFIX}.version": request.version,
@@ -89,6 +92,10 @@ class DockerRuntimeManager(RuntimeManager):
                 "AGENT_TOOLS": ",".join(request.tools),
                 "A4S_API_URL": self._api_base_url,
             }
+            for key in PASSTHROUGH_ENV_KEYS:
+                if os.environ.get(key):
+                    environment[key] = os.environ[key]
+
             container = self._client.containers.run(
                 request.image,
                 detach=True,
@@ -99,7 +106,7 @@ class DockerRuntimeManager(RuntimeManager):
             )
             logger.info("Spawned agent %s (container %s)", request.name, container.id)
             return Agent(
-                id=container.id,
+                id=request.agent_id,
                 name=request.name,
                 description=request.description,
                 version=request.version,
@@ -130,7 +137,7 @@ class DockerRuntimeManager(RuntimeManager):
             container.remove()
             logger.info("Stopped agent %s", agent_id)
             return Agent(
-                id=container.id,
+                id=labels.get(f"{LABEL_PREFIX}.agent_id", container.id),
                 name=labels.get(f"{LABEL_PREFIX}.name", ""),
                 description=labels.get(f"{LABEL_PREFIX}.description", ""),
                 version=labels.get(f"{LABEL_PREFIX}.version", ""),
@@ -157,7 +164,7 @@ class DockerRuntimeManager(RuntimeManager):
             labels = c.labels
             agents.append(
                 Agent(
-                    id=c.id,
+                    id=labels.get(f"{LABEL_PREFIX}.agent_id", c.id),
                     name=labels.get(f"{LABEL_PREFIX}.name", ""),
                     description=labels.get(f"{LABEL_PREFIX}.description", ""),
                     version=labels.get(f"{LABEL_PREFIX}.version", ""),
