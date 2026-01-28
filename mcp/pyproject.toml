@@ -9,6 +9,7 @@ description = "MCP server for A4S"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "a2a-sdk>=0.3.0",
     "httpx>=0.28",
     "mcp>=1.26.0",
     "pydantic-settings>=2.12.0",

@@ -1,9 +1,21 @@
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
+from uuid import uuid4
 
 import httpx
+from a2a.client import A2AClient
+from a2a.types import (
+    AgentCard,
+    Message,
+    MessageSendConfiguration,
+    MessageSendParams,
+    SendMessageRequest,
+    Task,
+    TextPart,
+)
 from mcp.server.fastmcp import Context, FastMCP
+from mcp.server.fastmcp.exceptions import ToolError
 from mcp.server.session import ServerSession
 
 from a4s_mcp.config import config
@@ -47,6 +59,66 @@ async def search_agents(
     resp = await client.get("/api/v1/agents/search", params={"query": query, "limit": limit})
     resp.raise_for_status()
     return resp.json()
+
+
+@mcp.tool()
+async def send_a2a_message(
+    ctx: Context[ServerSession, AppContext],
+    agent_id: str,
+    message: str,
+) -> dict:
+    """Send a message to a peer agent via A2A protocol.
+
+    Use search_agents first to find agents by capability, then call this with the agent's id.
+
+    Args:
+        agent_id: ID of the target agent (from search_agents results).
+        message: The text message to send.
+
+    Returns:
+        {state, text}
+    """
+    api_client = ctx.request_context.lifespan_context.client
+    resp = await api_client.get(f"/api/v1/agents/{agent_id}")
+    if resp.status_code == 404:
+        raise ToolError(f"Agent '{agent_id}' not found. Use search_agents to find agents.")
+    resp.raise_for_status()
+    agent = resp.json()
+    agent_url = agent["url"]
+
+    async with httpx.AsyncClient() as http_client:
+        card_resp = await http_client.get(f"{agent_url}/.well-known/agent.json")
+        card_resp.raise_for_status()
+        agent_card = AgentCard.model_validate(card_resp.json())
+        a2a_client = A2AClient(http_client, agent_card=agent_card)
+
+        msg = Message(
+            role="user",
+            parts=[TextPart(text=message)],
+            message_id=str(uuid4()),
+        )
+        payload = MessageSendParams(
+            message=msg,
+            configuration=MessageSendConfiguration(accepted_output_modes=["text"]),
+        )
+        request = SendMessageRequest(id=str(uuid4()), params=payload)
+
+        response = await a2a_client.send_message(request)
+
+    text_parts: list[str] = []
+    state = "unknown"
+
+    result = response.result
+    if isinstance(result, Task):
+        state = result.status.state.value if result.status else "unknown"
+        if result.artifacts:
+            for artifact in result.artifacts:
+                text_parts.extend(part.text for part in artifact.parts if isinstance(part, TextPart))
+    elif isinstance(result, Message):
+        state = "completed"
+        text_parts.extend(part.text for part in result.parts if isinstance(part, TextPart))
+
+    return {"state": state, "text": "\n".join(text_parts) if text_parts else None}
 
 
 @mcp.tool()
