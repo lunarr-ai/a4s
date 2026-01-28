@@ -7,6 +7,7 @@ import httpx
 from a2a.client import A2AClient
 from a2a.types import (
     AgentCard,
+    JSONRPCErrorResponse,
     Message,
     MessageSendConfiguration,
     MessageSendParams,
@@ -62,7 +63,7 @@ async def search_agents(
 
 
 @mcp.tool()
-async def send_a2a_message(
+async def send_a2a_message(  # noqa: C901
     ctx: Context[ServerSession, AppContext],
     agent_id: str,
     message: str,
@@ -86,7 +87,8 @@ async def send_a2a_message(
     agent = resp.json()
     agent_url = agent["url"]
 
-    async with httpx.AsyncClient() as http_client:
+    timeout = httpx.Timeout(120.0, connect=10.0)
+    async with httpx.AsyncClient(timeout=timeout) as http_client:
         card_resp = await http_client.get(f"{agent_url}/.well-known/agent.json")
         card_resp.raise_for_status()
         agent_card = AgentCard.model_validate(card_resp.json())
@@ -108,15 +110,28 @@ async def send_a2a_message(
     text_parts: list[str] = []
     state = "unknown"
 
-    result = response.result
+    if isinstance(response.root, JSONRPCErrorResponse):
+        raise ToolError(f"A2A error: {response.root.error.message}")
+
+    def extract_text(parts: list) -> list[str]:
+        texts = []
+        for part in parts:
+            inner = part.root if hasattr(part, "root") else part
+            if isinstance(inner, TextPart):
+                texts.append(inner.text)
+        return texts
+
+    result = response.root.result
     if isinstance(result, Task):
         state = result.status.state.value if result.status else "unknown"
         if result.artifacts:
             for artifact in result.artifacts:
-                text_parts.extend(part.text for part in artifact.parts if isinstance(part, TextPart))
+                text_parts.extend(extract_text(artifact.parts))
+        if result.status and result.status.message:
+            text_parts.extend(extract_text(result.status.message.parts))
     elif isinstance(result, Message):
         state = "completed"
-        text_parts.extend(part.text for part in result.parts if isinstance(part, TextPart))
+        text_parts.extend(extract_text(result.parts))
 
     return {"state": state, "text": "\n".join(text_parts) if text_parts else None}
 
