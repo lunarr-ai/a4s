@@ -23,4 +23,4 @@ a4s-mcp = { workspace = true }
 package = true
 
 [tool.hatch.build.targets.wheel]
-packages = ["hello_world_agent"]
+packages = ["placeholder_agent"]

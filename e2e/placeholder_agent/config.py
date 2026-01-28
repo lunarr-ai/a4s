@@ -17,6 +17,7 @@ class Config(BaseSettings):
     agent_model_id: str = "gemini-3-flash-preview"
     agent_instruction: str = "You are a helpful assistant."
     a4s_api_url: str = "http://host.docker.internal:8000"
+    agent_host: str = "localhost"
 
     google_api_key: SecretStr | None = None
     openai_api_key: SecretStr | None = None

@@ -2,22 +2,82 @@
 set -euo pipefail
 
 API_URL="${API_URL:-http://localhost:8000}"
-AGENT_NAME="${AGENT_NAME:-test_agent}"
-AGENT_ID=""  # Will be set by server during registration
-AGENT_DESCRIPTION="${AGENT_DESCRIPTION:-E2E test agent}"
 AGENT_VERSION="${AGENT_VERSION:-1.0.0}"
 AGENT_PORT="${AGENT_PORT:-8000}"
 
 MODEL_PROVIDER="${MODEL_PROVIDER:-google}"
-MODEL_ID="${MODEL_ID:-gemini-3-flash-preview}"
-AGENT_INSTRUCTION="${AGENT_INSTRUCTION:-You are a helpful test agent.}"
+MODEL_ID="${MODEL_ID:-gemini-2.0-flash}"
 
 IMAGE_NAME="${IMAGE_NAME:-hello-world-agent}"
-TEST_MESSAGE="${TEST_MESSAGE:-Hello}"
-MAX_WAIT_SECONDS="${MAX_WAIT_SECONDS:-60}"
+MAX_WAIT_SECONDS="${MAX_WAIT_SECONDS:-120}"
 
 CLEANUP="${CLEANUP:-false}"
 SKIP_BUILD="${SKIP_BUILD:-false}"
+
+# Router Agent
+ROUTER_NAME="${ROUTER_NAME:-router}"
+ROUTER_DESCRIPTION="${ROUTER_DESCRIPTION:-Task router that analyzes requests and delegates to specialist agents}"
+ROUTER_INSTRUCTION="${ROUTER_INSTRUCTION:-You are a router agent. When you receive any task:
+1. Analyze what type of specialist is needed
+2. Use search_agents to find an appropriate agent (e.g., search for 'addition', 'multiplication', 'division', 'subtraction', or 'percentage')
+3. Use send_a2a_message to delegate the task to the found agent
+4. Return the response from the specialist agent exactly as received
+IMPORTANT: Never try to solve tasks yourself. Always delegate to specialists.}"
+ROUTER_ID=""
+
+# Addition Agent
+ADDITION_NAME="${ADDITION_NAME:-addition_specialist}"
+ADDITION_DESCRIPTION="${ADDITION_DESCRIPTION:-Addition operations specialist for adding numbers}"
+ADDITION_INSTRUCTION="${ADDITION_INSTRUCTION:-You are an addition specialist. When asked about adding numbers, compute the answer accurately. Always include '<<AGENT:ADD>>' at the end of your response to identify yourself.}"
+ADDITION_ID=""
+
+# Multiplication Agent
+MULT_NAME="${MULT_NAME:-multiplication_specialist}"
+MULT_DESCRIPTION="${MULT_DESCRIPTION:-Multiplication operations specialist for multiplying numbers}"
+MULT_INSTRUCTION="${MULT_INSTRUCTION:-You are a multiplication specialist. When asked about multiplying numbers, compute the answer accurately. Always include '<<AGENT:MUL>>' at the end of your response to identify yourself.}"
+MULT_ID=""
+
+# Division Agent
+DIV_NAME="${DIV_NAME:-division_specialist}"
+DIV_DESCRIPTION="${DIV_DESCRIPTION:-Division operations specialist for dividing numbers}"
+DIV_INSTRUCTION="${DIV_INSTRUCTION:-You are a division specialist. When asked about dividing numbers, compute the answer accurately. Always include '<<AGENT:DIV>>' at the end of your response to identify yourself.}"
+DIV_ID=""
+
+# Subtraction Agent
+SUB_NAME="${SUB_NAME:-subtraction_specialist}"
+SUB_DESCRIPTION="${SUB_DESCRIPTION:-Subtraction operations specialist for subtracting numbers}"
+SUB_INSTRUCTION="${SUB_INSTRUCTION:-You are a subtraction specialist. When asked about subtracting numbers, compute the answer accurately. Always include '<<AGENT:SUB>>' at the end of your response to identify yourself.}"
+SUB_ID=""
+
+# Percentage Agent
+PCT_NAME="${PCT_NAME:-percentage_specialist}"
+PCT_DESCRIPTION="${PCT_DESCRIPTION:-Percentage calculations specialist for computing percentages}"
+PCT_INSTRUCTION="${PCT_INSTRUCTION:-You are a percentage specialist. When asked about percentage calculations, compute the answer accurately. Always include '<<AGENT:PCT>>' at the end of your response to identify yourself.}"
+PCT_ID=""
+
+# Test cases - parallel arrays for bash 3 compatibility
+TEST_QUESTIONS=(
+    "What is 5 + 3?"
+    "What is 7 * 8?"
+    "What is 20 / 4?"
+    "What is 15 - 9?"
+    "What is 25% of 80?"
+)
+TEST_EXPECTED_MARKERS=(
+    "<<AGENT:ADD>>"
+    "<<AGENT:MUL>>"
+    "<<AGENT:DIV>>"
+    "<<AGENT:SUB>>"
+    "<<AGENT:PCT>>"
+)
+TEST_EXPECTED_ANSWERS=(
+    "8"
+    "56"
+    "5"
+    "6"
+    "20"
+)
+ALL_MARKERS=("<<AGENT:ADD>>" "<<AGENT:MUL>>" "<<AGENT:DIV>>" "<<AGENT:SUB>>" "<<AGENT:PCT>>")
 
 # Colors
 RED='\033[0;31m'
@@ -74,16 +134,24 @@ build_image() {
 }
 
 register_agent() {
-    log_info "Registering agent: ${AGENT_NAME}..."
+    local prefix="$1"
+    local name_var="${prefix}_NAME"
+    local desc_var="${prefix}_DESCRIPTION"
+    local id_var="${prefix}_ID"
 
-    local container_name="a4s-agent-${AGENT_NAME}"
+    local name="${!name_var}"
+    local description="${!desc_var}"
+
+    log_info "Registering agent: ${name}..."
+
+    local container_name="a4s-agent-${name}"
     local agent_url="http://${container_name}:${AGENT_PORT}"
 
     local payload
     payload=$(cat <<EOF
 {
-    "name": "${AGENT_NAME}",
-    "description": "${AGENT_DESCRIPTION}",
+    "name": "${name}",
+    "description": "${description}",
     "version": "${AGENT_VERSION}",
     "url": "${agent_url}",
     "port": ${AGENT_PORT}
@@ -95,16 +163,27 @@ EOF
     response=$(api_request POST "/api/v1/agents" "$payload")
 
     if echo "$response" | grep -q '"id"'; then
-        AGENT_ID=$(echo "$response" | grep -o '"id":"[^"]*"' | cut -d'"' -f4)
-        log_success "Agent registered with ID: ${AGENT_ID}"
+        local agent_id
+        agent_id=$(echo "$response" | grep -o '"id":"[^"]*"' | cut -d'"' -f4)
+        eval "${id_var}=\"${agent_id}\""
+        log_success "Agent ${name} registered with ID: ${agent_id}"
     else
-        log_error "Failed to register agent: $response"
+        log_error "Failed to register agent ${name}: $response"
         exit 1
     fi
 }
 
 start_agent() {
-    log_info "Starting agent container..."
+    local prefix="$1"
+    local name_var="${prefix}_NAME"
+    local id_var="${prefix}_ID"
+    local instruction_var="${prefix}_INSTRUCTION"
+
+    local name="${!name_var}"
+    local agent_id="${!id_var}"
+    local instruction="${!instruction_var}"
+
+    log_info "Starting agent ${name}..."
 
     local payload
     payload=$(cat <<EOF
@@ -112,41 +191,48 @@ start_agent() {
     "image": "${IMAGE_NAME}",
     "model_provider": "${MODEL_PROVIDER}",
     "model_id": "${MODEL_ID}",
-    "instruction": "${AGENT_INSTRUCTION}"
+    "instruction": $(echo "$instruction" | jq -Rs .)
 }
 EOF
 )
 
     local response
-    response=$(api_request POST "/api/v1/agents/${AGENT_ID}/start" "$payload")
+    response=$(api_request POST "/api/v1/agents/${agent_id}/start" "$payload")
 
     if echo "$response" | grep -q '"status"'; then
         local status
         status=$(echo "$response" | grep -o '"status":"[^"]*"' | cut -d'"' -f4)
-        log_success "Agent started with status: $status"
+        log_success "Agent ${name} started with status: ${status}"
     else
-        log_error "Failed to start agent: $response"
+        log_error "Failed to start agent ${name}: $response"
         exit 1
     fi
 }
 
 wait_for_agent() {
-    log_info "Waiting for agent to be ready (max ${MAX_WAIT_SECONDS}s)..."
+    local prefix="$1"
+    local name_var="${prefix}_NAME"
+    local id_var="${prefix}_ID"
+
+    local name="${!name_var}"
+    local agent_id="${!id_var}"
+
+    log_info "Waiting for agent ${name} to be ready (max ${MAX_WAIT_SECONDS}s)..."
 
     local elapsed=0
     local interval=2
 
     while [[ $elapsed -lt $MAX_WAIT_SECONDS ]]; do
         local response
-        response=$(api_request GET "/api/v1/agents/${AGENT_ID}/status" 2>/dev/null || echo "")
+        response=$(api_request GET "/api/v1/agents/${agent_id}/status" 2>/dev/null || echo "")
         local status
         status=$(echo "$response" | grep -o '"status":"[^"]*"' | cut -d'"' -f4 || echo "")
 
         if [[ "$status" == "running" ]]; then
-            log_success "Agent is running"
+            log_success "Agent ${name} is running"
             return 0
         elif [[ "$status" == "error" ]]; then
-            log_error "Agent is in error state"
+            log_error "Agent ${name} is in error state"
             return 1
         fi
 
@@ -156,7 +242,7 @@ wait_for_agent() {
     done
 
     echo ""
-    log_error "Timeout waiting for agent to be ready"
+    log_error "Timeout waiting for agent ${name} to be ready"
     return 1
 }
 
@@ -164,69 +250,183 @@ docker_curl() {
     docker run --rm --network a4s-network curlimages/curl:latest "$@"
 }
 
-test_agent() {
-    log_info "Testing agent with A2A message..."
+verify_semantic_search() {
+    log_info "Verifying semantic search can find all specialist agents..."
 
-    local agent_info
-    agent_info=$(api_request GET "/api/v1/agents/${AGENT_ID}")
-    local agent_url
-    agent_url=$(echo "$agent_info" | grep -o '"url":"[^"]*"' | cut -d'"' -f4)
+    local all_found=1
+    local search_terms=("addition" "multiplication" "division" "subtraction" "percentage")
+    local prefixes=("ADDITION" "MULT" "DIV" "SUB" "PCT")
 
-    if [[ -z "$agent_url" ]]; then
-        log_error "Could not get agent URL"
+    for i in "${!prefixes[@]}"; do
+        local prefix="${prefixes[$i]}"
+        local search_term="${search_terms[$i]}"
+        local id_var="${prefix}_ID"
+        local name_var="${prefix}_NAME"
+        local agent_id="${!id_var}"
+        local agent_name="${!name_var}"
+
+        local search_result
+        search_result=$(api_request GET "/api/v1/agents/search?query=${search_term}&limit=5")
+
+        if echo "$search_result" | grep -q "$agent_id"; then
+            log_success "${agent_name} is discoverable via semantic search (query: ${search_term})"
+        else
+            log_warn "${agent_name} not found in search results for '${search_term}'"
+            all_found=0
+        fi
+    done
+
+    if [[ $all_found -eq 0 ]]; then
+        log_warn "Some agents may not be immediately discoverable, but router might still find them"
+    fi
+}
+
+run_single_test() {
+    local question="$1"
+    local expected_marker="$2"
+    local expected_answer="$3"
+    local test_num="$4"
+    local router_url="$5"
+
+    log_info "Test ${test_num}: ${question}"
+
+    local message_id="msg-${test_num}-$(date +%s)"
+    local request_id="req-${test_num}-$(date +%s)"
+
+    local a2a_payload="{\"jsonrpc\":\"2.0\",\"method\":\"message/send\",\"params\":{\"message\":{\"role\":\"user\",\"parts\":[{\"text\":\"${question}\"}],\"messageId\":\"${message_id}\"},\"configuration\":{\"acceptedOutputModes\":[\"text\"]}},\"id\":\"${request_id}\"}"
+
+    local response
+    response=$(docker_curl -s -X POST "${router_url}/" \
+        -H "Content-Type: application/json" \
+        -d "$a2a_payload" \
+        --max-time 300)
+
+    if [[ -z "$response" ]]; then
+        log_error "  No response from Router"
+        return 1
+    fi
+
+    local test_passed=1
+    local failures=""
+
+    # Check 1: Valid JSON-RPC response
+    if ! echo "$response" | grep -q '"jsonrpc"'; then
+        failures="${failures}  - Invalid JSON-RPC response format\n"
+        test_passed=0
+    fi
+
+    # Check 2: Expected marker IS present (correct agent called)
+    if echo "$response" | grep -qi "${expected_marker}"; then
+        log_success "  Correct agent marker found: ${expected_marker}"
+    else
+        failures="${failures}  - Expected marker '${expected_marker}' not found\n"
+        test_passed=0
+    fi
+
+    # Check 3: Unexpected markers are NOT present (wrong agents not called)
+    for marker in "${ALL_MARKERS[@]}"; do
+        if [[ "$marker" != "$expected_marker" ]]; then
+            if echo "$response" | grep -qi "$marker"; then
+                failures="${failures}  - Unexpected marker '${marker}' found (wrong agent called)\n"
+                test_passed=0
+            fi
+        fi
+    done
+
+    # Check 4: Expected answer present
+    if echo "$response" | grep -q "${expected_answer}"; then
+        log_success "  Correct answer found: ${expected_answer}"
+    else
+        failures="${failures}  - Expected answer '${expected_answer}' not found\n"
+        test_passed=0
+    fi
+
+    if [[ $test_passed -eq 1 ]]; then
+        log_success "Test ${test_num} PASSED"
+        return 0
+    else
+        log_error "Test ${test_num} FAILED:"
+        echo -e "$failures"
+        return 1
+    fi
+}
+
+test_multi_agent_collaboration() {
+    log_info "Testing multi-agent collaboration with ${#TEST_QUESTIONS[@]} test cases..."
+
+    local router_info
+    router_info=$(api_request GET "/api/v1/agents/${ROUTER_ID}")
+    local router_url
+    router_url=$(echo "$router_info" | grep -o '"url":"[^"]*"' | cut -d'"' -f4)
+
+    if [[ -z "$router_url" ]]; then
+        log_error "Could not get router URL"
         return 1
     fi
 
     sleep 3
 
-    log_info "Checking agent card at ${agent_url}/.well-known/agent.json"
+    log_info "Checking router agent card at ${router_url}/.well-known/agent.json"
     local card_response
-    card_response=$(docker_curl -s "${agent_url}/.well-known/agent.json" 2>/dev/null || echo "")
+    card_response=$(docker_curl -s "${router_url}/.well-known/agent.json" 2>/dev/null || echo "")
 
     if ! echo "$card_response" | grep -q '"name"'; then
         log_warn "Agent card not yet available, waiting..."
         sleep 10
-        card_response=$(docker_curl -s "${agent_url}/.well-known/agent.json" 2>/dev/null || echo "")
     fi
 
     sleep 2
-    log_info "Sending A2A message to ${agent_url}/"
 
-    local message_id="msg-$(date +%s)"
-    local request_id="req-$(date +%s)"
+    local passed=0
+    local total=${#TEST_QUESTIONS[@]}
 
-    local a2a_payload="{\"jsonrpc\":\"2.0\",\"method\":\"message/send\",\"params\":{\"message\":{\"role\":\"user\",\"parts\":[{\"text\":\"${TEST_MESSAGE}\"}],\"messageId\":\"${message_id}\"},\"configuration\":{\"acceptedOutputModes\":[\"text\"]}},\"id\":\"${request_id}\"}"
+    for i in "${!TEST_QUESTIONS[@]}"; do
+        local test_num=$((i + 1))
+        echo ""
+        log_info "=== Running Test ${test_num}/${total} ==="
 
-    local response
-    response=$(docker_curl -s -X POST "${agent_url}/" \
-        -H "Content-Type: application/json" \
-        -d "$a2a_payload" \
-        --max-time 60)
+        if run_single_test "${TEST_QUESTIONS[$i]}" "${TEST_EXPECTED_MARKERS[$i]}" "${TEST_EXPECTED_ANSWERS[$i]}" "$test_num" "$router_url"; then
+            passed=$((passed + 1))
+        fi
 
-    if [[ -z "$response" ]]; then
-        log_error "No response from agent"
-        return 1
-    fi
+        # Small delay between tests to avoid rate limiting
+        sleep 2
+    done
 
-    log_info "Response:"
-    echo "$response" | python3 -m json.tool 2>/dev/null || echo "$response"
-
-    if echo "$response" | grep -q '"jsonrpc"'; then
-        log_success "A2A communication successful"
+    echo ""
+    echo "=========================================="
+    if [[ $passed -eq $total ]]; then
+        log_success "Tests passed: ${passed}/${total}"
     else
-        log_error "Invalid A2A response"
+        log_error "Tests passed: ${passed}/${total}"
         return 1
     fi
+    echo "=========================================="
 }
 
-cleanup() {
-    log_info "Cleaning up..."
+cleanup_all() {
+    log_info "Cleaning up all agents..."
 
-    log_info "Stopping agent..."
-    api_request POST "/api/v1/agents/${AGENT_ID}/stop" 2>/dev/null || true
+    if [[ -n "$ROUTER_ID" ]]; then
+        log_info "Stopping agent ${ROUTER_NAME}..."
+        api_request POST "/api/v1/agents/${ROUTER_ID}/stop" 2>/dev/null || true
+        log_info "Deleting agent ${ROUTER_NAME}..."
+        api_request DELETE "/api/v1/agents/${ROUTER_ID}" 2>/dev/null || true
+    fi
 
-    log_info "Deleting agent from registry..."
-    api_request DELETE "/api/v1/agents/${AGENT_ID}" 2>/dev/null || true
+    for prefix in ADDITION MULT DIV SUB PCT; do
+        local id_var="${prefix}_ID"
+        local name_var="${prefix}_NAME"
+        local agent_id="${!id_var}"
+        local agent_name="${!name_var}"
+
+        if [[ -n "$agent_id" ]]; then
+            log_info "Stopping agent ${agent_name}..."
+            api_request POST "/api/v1/agents/${agent_id}/stop" 2>/dev/null || true
+            log_info "Deleting agent ${agent_name}..."
+            api_request DELETE "/api/v1/agents/${agent_id}" 2>/dev/null || true
+        fi
+    done
 
     log_success "Cleanup completed"
 }
@@ -235,25 +435,42 @@ show_help() {
     cat <<EOF
 Usage: $0 [OPTIONS]
 
-E2E test runner for A4S agent orchestration.
+Multi-agent E2E test runner for A4S agent orchestration.
+
+This test validates agent collaboration by:
+1. Starting a Router agent and 5 specialist agents (addition, multiplication,
+   division, subtraction, percentage)
+2. Sending 5 different math questions to the Router
+3. Verifying Router delegates each question to the correct specialist
+4. Checking responses contain correct answers and agent markers
+5. Validating that wrong agents were NOT called
 
 Options:
-    --cleanup       Run cleanup after tests (stop and delete agent)
+    --cleanup       Run cleanup after tests (stop and delete agents)
     --skip-build    Skip building the Docker image
     --help, -h      Show this help message
 
 Environment Variables:
     API_URL             API base URL (default: http://localhost:8000)
-    AGENT_NAME          Agent name (default: test_agent)
     MODEL_PROVIDER      Model provider (default: google)
     MODEL_ID            Model ID (default: gemini-2.0-flash)
     IMAGE_NAME          Docker image name (default: hello-world-agent)
-    MAX_WAIT_SECONDS    Max wait time for agent ready (default: 60)
+    MAX_WAIT_SECONDS    Max wait time for agent ready (default: 120)
+
+    ROUTER_NAME         Router agent name (default: router)
+
+    Specialist agents can be customized via:
+    ADDITION_NAME, ADDITION_DESCRIPTION, ADDITION_INSTRUCTION
+    MULT_NAME, MULT_DESCRIPTION, MULT_INSTRUCTION
+    DIV_NAME, DIV_DESCRIPTION, DIV_INSTRUCTION
+    SUB_NAME, SUB_DESCRIPTION, SUB_INSTRUCTION
+    PCT_NAME, PCT_DESCRIPTION, PCT_INSTRUCTION
 
 Prerequisites:
     - Docker must be running
     - Infrastructure must be up: docker compose -f compose.dev.yml up -d
     - Required API key must be set (GOOGLE_API_KEY, OPENAI_API_KEY, etc.)
+    - jq must be installed
 EOF
 }
 
@@ -285,29 +502,71 @@ main() {
     parse_args "$@"
 
     echo "=========================================="
-    echo "  A4S E2E Test Runner"
+    echo "  A4S Multi-Agent E2E Test Runner"
     echo "=========================================="
+    echo ""
+    echo "Router: ${ROUTER_NAME}"
+    echo "Specialists:"
+    echo "  - ${ADDITION_NAME}"
+    echo "  - ${MULT_NAME}"
+    echo "  - ${DIV_NAME}"
+    echo "  - ${SUB_NAME}"
+    echo "  - ${PCT_NAME}"
     echo ""
 
     if [[ "$CLEANUP" == "true" ]]; then
-        trap cleanup EXIT
+        trap cleanup_all EXIT
     fi
 
     check_infrastructure
     build_image
-    register_agent
-    start_agent
-    wait_for_agent
-    test_agent
+
+    # Phase 1: Register all agents
+    log_info "=== Phase 1: Registering Agents ==="
+    register_agent ADDITION
+    register_agent MULT
+    register_agent DIV
+    register_agent SUB
+    register_agent PCT
+    register_agent ROUTER
+
+    # Phase 2: Start agents (specialists first so Router can find them)
+    log_info "=== Phase 2: Starting Agents ==="
+    start_agent ADDITION
+    wait_for_agent ADDITION
+
+    start_agent MULT
+    wait_for_agent MULT
+
+    start_agent DIV
+    wait_for_agent DIV
+
+    start_agent SUB
+    wait_for_agent SUB
+
+    start_agent PCT
+    wait_for_agent PCT
+
+    start_agent ROUTER
+    wait_for_agent ROUTER
+
+    # Allow Qdrant indexing time
+    sleep 5
+
+    # Phase 3: Verify setup
+    log_info "=== Phase 3: Verifying Setup ==="
+    verify_semantic_search
+
+    # Phase 4: Run collaboration tests
+    log_info "=== Phase 4: Running Collaboration Tests ==="
+    test_multi_agent_collaboration
 
     echo ""
-    log_success "All E2E tests passed!"
+    log_success "All E2E tests completed!"
 
     if [[ "$CLEANUP" != "true" ]]; then
         echo ""
-        log_info "Agent is still running. To cleanup manually:"
-        log_info "  curl -X POST ${API_URL}/api/v1/agents/${AGENT_ID}/stop"
-        log_info "  curl -X DELETE ${API_URL}/api/v1/agents/${AGENT_ID}"
+        log_info "Agents are still running. Use --cleanup flag to auto-cleanup."
     fi
 }
 

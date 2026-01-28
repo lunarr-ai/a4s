@@ -5,8 +5,8 @@ from google.adk.models.lite_llm import LiteLlm
 from google.adk.tools.mcp_tool import McpToolset
 from google.adk.tools.mcp_tool.mcp_session_manager import StdioConnectionParams
 
-from hello_world_agent.config import LLMProvider, config
 from mcp import StdioServerParameters
+from placeholder_agent.config import LLMProvider, config
 
 AGENT_INSTRUCTION = """You are {agent_name}, a collaborative AI agent.
 
@@ -48,7 +48,7 @@ def create_agent() -> LlmAgent:
                 args=["run", "-m", "a4s_mcp"],
                 env={"API_BASE_URL": config.a4s_api_url},
             ),
-            timeout=30,
+            timeout=180,
         ),
         tool_filter=["search_agents", "send_a2a_message"],
     )

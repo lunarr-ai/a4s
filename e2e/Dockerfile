@@ -15,4 +15,4 @@ ENV UV_PROJECT_ENVIRONMENT=/app/.venv
 
 EXPOSE 8000
 
-CMD [".venv/bin/python", "-m", "hello_world_agent.server"]
+CMD [".venv/bin/python", "-m", "placeholder_agent.server"]
