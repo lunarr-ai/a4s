@@ -1,4 +1,26 @@
 services:
+  a4s-api:
+    # Force x86_64 for sqlite-vec compatibility on Apple Silicon.
+    # Remove if sqlite-vec adds proper ARM64 Linux wheels.
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    ports:
+      - "8000:8000"
+    user: root
+    env_file:
+      - api/.env
+    environment:
+      - API_BASE_URL=http://a4s-api:8000
+      - AGENT_NETWORK=a4s-network
+      - QDRANT_URL=http://registry:6333
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - model-cache:/root/.cache
+    networks:
+      - a4s-network
+
   registry:
     image: qdrant/qdrant:v1.16
     ports:
@@ -6,6 +28,13 @@ services:
       - "6334:6334"
     volumes:
       - registry-data:/data
+    networks:
+      - a4s-network
+
+networks:
+  a4s-network:
+    name: a4s-network
 
 volumes:
   registry-data:
+  model-cache:
