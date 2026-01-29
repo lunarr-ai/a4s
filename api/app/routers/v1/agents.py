@@ -1,14 +1,16 @@
 from typing import TYPE_CHECKING, Annotated
 
 from fastapi import APIRouter, Query, Request
+from fastapi.responses import Response
 from pydantic import BaseModel, Field
 
-from app.models import Agent, AgentModel, AgentStatus, ModelProvider
+from app.models import Agent, AgentMode, AgentStatus, SpawnConfig
 from app.runtime.models import SpawnAgentRequest
 from app.utils import generate_agent_id
 
 if TYPE_CHECKING:
     from app.broker.registry import AgentRegistry
+    from app.runtime.agent_scheduler import AgentScheduler
     from app.runtime.manager import RuntimeManager
 
 router = APIRouter(prefix="/agents", tags=["agents"])
@@ -26,6 +28,8 @@ class RegisterAgentRequest(BaseModel):
     )
     port: int = Field(description="Port the agent listens on.", default=8000)
     owner_id: str = Field(description="ID of the agent's owner.")
+    mode: AgentMode = Field(default=AgentMode.SERVERLESS, description="Runtime mode of the agent.")
+    spawn_config: SpawnConfig = Field(description="Configuration for spawning agent containers.")
 
 
 class AgentListResponse(BaseModel):
@@ -43,16 +47,6 @@ class AgentSearchResponse(BaseModel):
     agents: list[Agent]
     query: str
     limit: int
-
-
-class StartAgentRequest(BaseModel):
-    """Request body for starting an agent container."""
-
-    image: str = Field(description="Docker image to use for the agent.")
-    model_provider: str = Field(description="Model provider (openai, anthropic, google, openrouter).")
-    model_id: str = Field(description="Model ID to use.")
-    instruction: str = Field(description="Instruction for the agent.", default="")
-    tools: list[str] = Field(description="Enabled tools for the agent.", default_factory=list)
 
 
 class AgentStatusResponse(BaseModel):
@@ -87,6 +81,8 @@ async def register_agent(request: Request, body: RegisterAgentRequest) -> Agent:
         port=body.port,
         owner_id=body.owner_id,
         status=AgentStatus.PENDING,
+        mode=body.mode,
+        spawn_config=body.spawn_config,
     )
     await registry.register_agent(agent)
     return agent
@@ -167,13 +163,12 @@ async def get_agent(request: Request, agent_id: str) -> Agent:
 
 
 @router.post("/{agent_id}/start")
-async def start_agent(request: Request, agent_id: str, body: StartAgentRequest) -> AgentStatusResponse:
-    """Start an agent container.
+async def start_agent(request: Request, agent_id: str) -> AgentStatusResponse:
+    """Start an agent container using spawn_config from registry.
 
     Args:
         request: FastAPI request object.
         agent_id: ID of the agent to start.
-        body: Container configuration for the agent.
 
     Returns:
         Status of the started agent.
@@ -186,24 +181,21 @@ async def start_agent(request: Request, agent_id: str, body: StartAgentRequest) 
     spawn_request = SpawnAgentRequest(
         agent_id=agent.id,
         name=agent.name,
-        image=body.image,
+        image=agent.spawn_config.image,
         version=agent.version,
         port=agent.port,
-        model=AgentModel(
-            provider=ModelProvider(body.model_provider),
-            model_id=body.model_id,
-        ),
+        model=agent.spawn_config.model,
         description=agent.description,
-        instruction=body.instruction,
-        tools=body.tools,
+        instruction=agent.spawn_config.instruction,
+        tools=agent.spawn_config.tools,
         owner_id=agent.owner_id,
     )
 
-    spawned_agent = runtime_manager.spawn_agent(spawn_request)
+    runtime_manager.spawn_agent(spawn_request)
     container_name = f"a4s-agent-{agent.id}"
     status = runtime_manager.get_agent_status(container_name)
 
-    return AgentStatusResponse(agent_id=spawned_agent.id, status=status)
+    return AgentStatusResponse(agent_id=agent.id, status=status)
 
 
 @router.post("/{agent_id}/stop")
@@ -247,3 +239,28 @@ async def get_agent_status(request: Request, agent_id: str) -> AgentStatusRespon
     status = runtime_manager.get_agent_status(container_name)
 
     return AgentStatusResponse(agent_id=agent_id, status=status)
+
+
+@router.post("/{agent_id}/ensure-running")
+async def ensure_running(request: Request, agent_id: str) -> Response:
+    """Ensure agent is running (for nginx auth_request).
+
+    Triggers cold start if needed, records activity.
+
+    Args:
+        request: FastAPI request object.
+        agent_id: ID of the agent to ensure is running.
+
+    Returns:
+        Empty 200 response on success.
+    """
+    scheduler: AgentScheduler = request.app.state.agent_scheduler
+    registry: AgentRegistry = request.app.state.registry
+
+    agent = await registry.get_agent(agent_id)
+
+    if agent.mode == AgentMode.SERVERLESS:
+        await scheduler.ensure_running(agent_id)
+        scheduler.record_activity(agent_id)
+
+    return Response(status_code=200)

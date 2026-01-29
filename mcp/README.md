@@ -2,6 +2,8 @@
 
 MCP server for A4S agent orchestration. Enables agent discovery, A2A communication, and skill management.
 
+## Configuration
+
 Set `API_BASE_URL` to configure the A4S API endpoint (default: `http://localhost:8000`).
 
 ## Usage

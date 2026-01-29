@@ -1,4 +1,18 @@
 services:
+  a4s-gateway:
+    image: nginx:1.29.4-alpine
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./nginx/nginx.conf.template:/etc/nginx/templates/default.conf.template:ro
+    environment:
+      - A4S_API_URL=http://a4s-api:8000
+      - NGINX_ENVSUBST_FILTER=A4S_API_URL
+    depends_on:
+      - a4s-api
+    networks:
+      - a4s-network
+
   a4s-api:
     # Force x86_64 for sqlite-vec compatibility on Apple Silicon.
     # Remove if sqlite-vec adds proper ARM64 Linux wheels.
@@ -14,15 +28,19 @@ services:
     environment:
       - API_BASE_URL=http://a4s-api:8000
       - AGENT_NETWORK=a4s-network
-      - QDRANT_URL=http://qdrant:6333
-      - GRAPHITI_FALKORDB_HOST=falkordb
+      - AGENT_GATEWAY_URL=http://a4s-gateway:8080
+      - QDRANT_URL=http://a4s-registry:6333
+      - GRAPHITI_FALKORDB_HOST=a4s-memory
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - model-cache:/root/.cache
+    depends_on:
+      - a4s-registry
+      - a4s-memory
     networks:
       - a4s-network
 
-  qdrant:
+  a4s-registry:
     image: qdrant/qdrant:v1.16
     ports:
       - "6333:6333"
@@ -32,7 +50,7 @@ services:
     networks:
       - a4s-network
 
-  falkordb:
+  a4s-memory:
     image: falkordb/falkordb:v4.16.0
     ports:
       - "6379:6379"

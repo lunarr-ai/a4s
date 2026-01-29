@@ -9,7 +9,7 @@ from qdrant_client.models import Distance, FieldCondition, Filter, MatchValue, P
 
 from app.broker.exceptions import AgentNotRegisteredError, AgentRegistryConnectionError
 from app.broker.registry import AgentRegistry
-from app.models import Agent, AgentStatus, EmbeddingModel
+from app.models import Agent, AgentMode, AgentStatus, EmbeddingModel, SpawnConfig
 
 logger = logging.getLogger(__name__)
 
@@ -64,9 +64,12 @@ class QdrantAgentRegistry(AgentRegistry):
             "owner_id": agent.owner_id,
             "status": agent.status.value,
             "created_at": agent.created_at.isoformat(),
+            "mode": agent.mode.value,
+            "spawn_config": agent.spawn_config.model_dump() if agent.spawn_config else None,
         }
 
     def _payload_to_agent(self, payload: dict) -> Agent:
+        spawn_config_data = payload.get("spawn_config")
         return Agent(
             id=payload["id"],
             name=payload["name"],
@@ -77,6 +80,8 @@ class QdrantAgentRegistry(AgentRegistry):
             owner_id=payload["owner_id"],
             status=AgentStatus(payload["status"]),
             created_at=datetime.fromisoformat(payload["created_at"]),
+            mode=AgentMode(payload.get("mode", AgentMode.SERVERLESS.value)),
+            spawn_config=SpawnConfig(**spawn_config_data) if spawn_config_data else None,
         )
 
     async def register_agent(self, agent: Agent) -> None:

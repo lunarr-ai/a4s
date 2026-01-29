@@ -14,6 +14,7 @@ from app.broker.qdrant_registry import QdrantAgentRegistry
 from app.config import config
 from app.memory.factory import create_memory_manager
 from app.routers import health_router, v1_router
+from app.runtime.agent_scheduler import AgentScheduler
 from app.runtime.docker_manager import DockerRuntimeManager
 from app.runtime.exceptions import AgentNotFoundError, AgentSpawnError, ImageNotFoundError
 from app.skills import exceptions as skills_exc
@@ -94,18 +95,28 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     runtime_manager = DockerRuntimeManager(
         api_base_url=config.api_base_url,
         network_name=config.agent_network,
+        agent_gateway_url=config.agent_gateway_url,
     )
     skills_registry = await SqliteSkillsRegistry.create(config.skills_db_path)
     memory_manager = await create_memory_manager(config)
+    agent_scheduler = AgentScheduler(
+        runtime_manager=runtime_manager,
+        registry=registry,
+        idle_timeout=config.agent_idle_timeout,
+        reaper_interval=config.agent_reaper_interval,
+    )
+    await agent_scheduler.start()
 
     app.state.registry = registry
     app.state.runtime_manager = runtime_manager
     app.state.skills_registry = skills_registry
     app.state.memory_manager = memory_manager
+    app.state.agent_scheduler = agent_scheduler
 
     try:
         yield
     finally:
+        await agent_scheduler.stop()
         await registry.close()
         runtime_manager.close()
         await skills_registry.close()

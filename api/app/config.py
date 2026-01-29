@@ -28,7 +28,12 @@ class Config(BaseSettings):
     # Backend
     cors_origins: list[str] = Field(default_factory=list)
     api_base_url: str = "http://localhost:8000"
-    agent_network: str = "a4s-agents"
+    agent_network: str = "a4s-network"
+
+    # Agent runtime
+    agent_idle_timeout: int = Field(default=300, description="Idle timeout in seconds")
+    agent_reaper_interval: int = Field(default=30, description="Reaper check interval")
+    agent_gateway_url: str = Field(default="http://localhost:8080", description="Gateway URL for agent routing")
 
     # Qdrant
     qdrant_url: str = "http://localhost:6333"
