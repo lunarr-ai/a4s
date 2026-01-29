@@ -12,6 +12,7 @@ from app.broker.exceptions import (
 )
 from app.broker.qdrant_registry import QdrantAgentRegistry
 from app.config import config
+from app.memory.mem0_manager import Mem0MemoryManager
 from app.routers import health_router, v1_router
 from app.runtime.docker_manager import DockerRuntimeManager
 from app.runtime.exceptions import AgentNotFoundError, AgentSpawnError, ImageNotFoundError
@@ -85,7 +86,7 @@ async def skill_registry_error_handler(_request: Request, exc: skills_exc.SkillR
 
 
 @asynccontextmanager
-async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     registry = QdrantAgentRegistry(
         url=config.qdrant_url,
         collection_name=config.registry_qdrant_collection,
@@ -95,10 +96,12 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
         network_name=config.agent_network,
     )
     skills_registry = await SqliteSkillsRegistry.create(config.skills_db_path)
+    memory_manager = await Mem0MemoryManager.create(config)
 
-    _app.state.registry = registry
-    _app.state.runtime_manager = runtime_manager
-    _app.state.skills_registry = skills_registry
+    app.state.registry = registry
+    app.state.runtime_manager = runtime_manager
+    app.state.skills_registry = skills_registry
+    app.state.memory_manager = memory_manager
 
     try:
         yield
