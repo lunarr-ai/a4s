@@ -139,16 +139,12 @@ register_agent() {
 
     log_info "Registering agent: ${name}..."
 
-    local container_name="a4s-agent-${name}"
-    local agent_url="http://${container_name}:${AGENT_PORT}"
-
     local payload
     payload=$(cat <<EOF
 {
     "name": "${name}",
     "description": "${description}",
     "version": "${AGENT_VERSION}",
-    "url": "${agent_url}",
     "port": ${AGENT_PORT}
 }
 EOF

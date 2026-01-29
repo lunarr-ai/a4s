@@ -20,7 +20,10 @@ class RegisterAgentRequest(BaseModel):
     name: str = Field(description="Name of the agent.")
     description: str = Field(description="Description of the agent capabilities.")
     version: str = Field(description="Version of the agent.", default="1.0.0")
-    url: str = Field(description="URL where the agent is accessible.")
+    url: str | None = Field(
+        default=None,
+        description="URL where the agent is accessible. Auto-generated for managed agents. Provide only for external agents not managed by A4S.",
+    )
     port: int = Field(description="Port the agent listens on.", default=8000)
 
 
@@ -72,12 +75,14 @@ async def register_agent(request: Request, body: RegisterAgentRequest) -> Agent:
     registry: AgentRegistry = request.app.state.registry
 
     agent_id = generate_agent_id(body.name)
+    # Auto-generate URL for managed agents; external agents provide their own
+    url = body.url if body.url else f"http://a4s-agent-{agent_id}:{body.port}"
     agent = Agent(
         id=agent_id,
         name=body.name,
         description=body.description,
         version=body.version,
-        url=body.url,
+        url=url,
         port=body.port,
         status=AgentStatus.PENDING,
     )
@@ -192,7 +197,7 @@ async def start_agent(request: Request, agent_id: str, body: StartAgentRequest) 
     )
 
     spawned_agent = runtime_manager.spawn_agent(spawn_request)
-    container_name = f"a4s-agent-{agent.name}"
+    container_name = f"a4s-agent-{agent.id}"
     status = runtime_manager.get_agent_status(container_name)
 
     return AgentStatusResponse(agent_id=spawned_agent.id, status=status)
@@ -213,7 +218,7 @@ async def stop_agent(request: Request, agent_id: str) -> AgentStatusResponse:
     runtime_manager: RuntimeManager = request.app.state.runtime_manager
 
     agent = await registry.get_agent(agent_id)
-    container_name = f"a4s-agent-{agent.name}"
+    container_name = f"a4s-agent-{agent.id}"
 
     runtime_manager.stop_agent(container_name)
 
@@ -235,7 +240,7 @@ async def get_agent_status(request: Request, agent_id: str) -> AgentStatusRespon
     runtime_manager: RuntimeManager = request.app.state.runtime_manager
 
     agent = await registry.get_agent(agent_id)
-    container_name = f"a4s-agent-{agent.name}"
+    container_name = f"a4s-agent-{agent.id}"
     status = runtime_manager.get_agent_status(container_name)
 
     return AgentStatusResponse(agent_id=agent_id, status=status)

@@ -40,9 +40,8 @@ class DockerRuntimeManager(RuntimeManager):
 
         self._api_base_url = api_base_url
 
-    # TODO: uniqueness
-    def _container_name(self, name: str) -> str:
-        return f"a4s-agent-{name}"
+    def _container_name(self, agent_id: str) -> str:
+        return f"a4s-agent-{agent_id}"
 
     def _ensure_network(self) -> None:
         try:
@@ -74,7 +73,7 @@ class DockerRuntimeManager(RuntimeManager):
             ImageNotFoundError: If the image cannot be pulled.
             AgentSpawnError: If the container fails to start.
         """
-        container_name = self._container_name(request.name)
+        container_name = self._container_name(request.agent_id)
         self._ensure_image(request.image)
         try:
             labels = {
