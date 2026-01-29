@@ -205,6 +205,126 @@ async def search_skills(
     }
 
 
+@mcp.tool()
+async def add_memory(
+    ctx: Context[ServerSession, AppContext],
+    messages: str,
+    user_id: str | None = None,
+    agent_id: str | None = None,
+) -> dict:
+    """Store a fact, preference, or conversation snippet.
+
+    When to use:
+    - Save user preferences ("prefers dark mode")
+    - Store facts for later recall
+    - Remember conversation context
+
+    Args:
+        messages: Text to store (e.g., "User prefers dark mode").
+        user_id: Scope to user (default: None).
+        agent_id: Scope to agent (default: None).
+
+    Returns:
+        {id, content}
+    """
+    client = ctx.request_context.lifespan_context.client
+    payload = {"messages": messages}
+    if user_id:
+        payload["user_id"] = user_id
+    if agent_id:
+        payload["agent_id"] = agent_id
+    resp = await client.post("/api/v1/memories", json=payload)
+    resp.raise_for_status()
+    data = resp.json()
+    return {"id": data["id"], "content": data["content"]}
+
+
+@mcp.tool()
+async def search_memories(
+    ctx: Context[ServerSession, AppContext],
+    query: str,
+    user_id: str | None = None,
+    agent_id: str | None = None,
+    limit: int = 10,
+) -> dict:
+    """Semantic search over stored memories.
+
+    When to use:
+    - Find relevant memories by meaning
+    - Recall user preferences
+    - Look up stored facts
+
+    Args:
+        query: Natural language search (e.g., "color preferences").
+        user_id: Filter by user.
+        agent_id: Filter by agent.
+        limit: Max results (default 10).
+
+    Returns:
+        {memories: [{id, content, score}], query, count}
+    """
+    client = ctx.request_context.lifespan_context.client
+    payload = {"query": query, "limit": limit}
+    if user_id:
+        payload["user_id"] = user_id
+    if agent_id:
+        payload["agent_id"] = agent_id
+    resp = await client.post("/api/v1/memories/search", json=payload)
+    resp.raise_for_status()
+    data = resp.json()
+    memories = [{"id": m["id"], "content": m["content"], "score": m.get("score")} for m in data]
+    return {"memories": memories, "query": query, "count": len(memories)}
+
+
+@mcp.tool()
+async def update_memory(
+    ctx: Context[ServerSession, AppContext],
+    memory_id: str,
+    content: str,
+) -> dict:
+    """Update an existing memory's content.
+
+    When to use:
+    - Correct outdated information
+    - Refine a stored fact
+
+    Args:
+        memory_id: ID from search_memories result.
+        content: New content text.
+
+    Returns:
+        {id, content}
+    """
+    client = ctx.request_context.lifespan_context.client
+    resp = await client.put(f"/api/v1/memories/{memory_id}", json={"content": content})
+    resp.raise_for_status()
+    data = resp.json()
+    return {"id": data["id"], "content": data["content"]}
+
+
+@mcp.tool()
+async def delete_memory(
+    ctx: Context[ServerSession, AppContext],
+    memory_id: str,
+) -> dict:
+    """Delete a memory by ID.
+
+    When to use:
+    - Remove outdated or incorrect memories
+    - Clean up after user request
+
+    Args:
+        memory_id: ID from search_memories result.
+
+    Returns:
+        {deleted: true, memory_id}
+    """
+    client = ctx.request_context.lifespan_context.client
+    resp = await client.delete(f"/api/v1/memories/{memory_id}")
+    resp.raise_for_status()
+    return {"deleted": True, "memory_id": memory_id}
+
+
 @mcp.resource("skill://{skill_name}/instructions")
 async def get_skill_instructions(skill_name: str) -> str:
     """Get the SKILL.md instructions for a skill.
@@ -317,3 +437,20 @@ async def discover_skills(task_description: str, limit: int = 5) -> str:
     )
 
     return "\n".join(parts)
+
+
+@mcp.prompt()
+def memory_assistant() -> str:
+    """Get help with memory operations."""
+    return """Memory tools for storing and retrieving information.
+
+Tools:
+- add_memory: Store facts, preferences, conversations
+- search_memories: Find memories by semantic search
+- update_memory: Modify existing memory content
+- delete_memory: Remove a memory
+
+Tips:
+- Use user_id/agent_id to scope memories
+- Search returns relevance scores (higher = better match)
+- Get memory_id from search results before update/delete"""
