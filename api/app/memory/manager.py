@@ -1,11 +1,17 @@
 from abc import ABC, abstractmethod
 
-from app.memory.models import CreateMemoryRequest, Memory, SearchMemoryRequest, UpdateMemoryRequest
+from app.memory.models import (
+    CreateMemoryRequest,
+    Memory,
+    QueuedMemoryResponse,
+    SearchMemoryRequest,
+    UpdateMemoryRequest,
+)
 
 
 class MemoryManager(ABC):
     @abstractmethod
-    async def add(self, request: CreateMemoryRequest) -> Memory:
+    async def add(self, request: CreateMemoryRequest) -> Memory | QueuedMemoryResponse:
         """Add a new memory."""
 
     @abstractmethod

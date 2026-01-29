@@ -48,3 +48,10 @@ class UpdateMemoryRequest(BaseModel):
     """Request to update an existing memory."""
 
     content: str = Field(description="New content for the memory.")
+
+
+class QueuedMemoryResponse(BaseModel):
+    """Response when memory is queued for async processing."""
+
+    message: str = Field(description="Status message.")
+    group_id: str = Field(description="Group ID the memory belongs to.")

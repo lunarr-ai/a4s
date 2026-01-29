@@ -5,6 +5,7 @@ from fastapi import APIRouter, HTTPException, Request
 from app.memory.models import (
     CreateMemoryRequest,
     Memory,
+    QueuedMemoryResponse,
     SearchMemoryRequest,
     UpdateMemoryRequest,
 )
@@ -16,7 +17,7 @@ router = APIRouter(prefix="/memories", tags=["memories"])
 
 
 @router.post("", status_code=201)
-async def add_memory(request: Request, body: CreateMemoryRequest) -> Memory:
+async def add_memory(request: Request, body: CreateMemoryRequest) -> Memory | QueuedMemoryResponse:
     """Add a new memory.
 
     Args:
@@ -24,7 +25,7 @@ async def add_memory(request: Request, body: CreateMemoryRequest) -> Memory:
         body: Memory creation details.
 
     Returns:
-        The created memory.
+        The created memory or queued response depending on the provider.
     """
     memory_manager: MemoryManager = request.app.state.memory_manager
     return await memory_manager.add(body)

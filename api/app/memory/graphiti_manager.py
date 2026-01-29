@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+import asyncio
 import logging
-from collections.abc import Iterable
+from collections.abc import Awaitable, Callable, Iterable
 from datetime import UTC, datetime
 
 from fastembed import TextEmbedding
@@ -19,6 +20,7 @@ from app.memory.manager import MemoryManager
 from app.memory.models import (
     CreateMemoryRequest,
     Memory,
+    QueuedMemoryResponse,
     SearchMemoryRequest,
     UpdateMemoryRequest,
 )
@@ -58,6 +60,8 @@ class GraphitiMemoryManager(MemoryManager):
     def __init__(self, graphiti: Graphiti, group_id: str) -> None:
         self._graphiti = graphiti
         self._group_id = group_id
+        self._queues: dict[str, asyncio.Queue[Callable[[], Awaitable[None]]]] = {}
+        self._workers: dict[str, asyncio.Task[None]] = {}
 
     @classmethod
     async def create(cls, config: Config | None = None) -> GraphitiMemoryManager:
@@ -150,28 +154,72 @@ class GraphitiMemoryManager(MemoryManager):
             parts.append(f"agent-{agent_id}")
         return "_".join(parts) if parts else self._group_id
 
-    async def add(self, request: CreateMemoryRequest) -> Memory:
+    async def add(self, request: CreateMemoryRequest) -> QueuedMemoryResponse:
+        """Add a new memory to the knowledge graph.
+
+        Args:
+            request: Memory creation request.
+
+        Returns:
+            Response indicating the memory has been queued for processing.
+        """
         if isinstance(request.messages, str):
             body = request.messages
         else:
             body = "\n".join(f"{m['role']}: {m['content']}" for m in request.messages)
 
         group_id = self._build_group_id(request.user_id, request.agent_id)
+        name = f"memory_{datetime.now(UTC).isoformat()}"
 
-        result = await self._graphiti.add_episode(
-            name=f"memory_{datetime.now(UTC).isoformat()}",
-            episode_body=body,
-            source=EpisodeType.text,
-            source_description="memory_api",
-            reference_time=datetime.now(UTC),
+        async def process_episode() -> None:
+            await self._graphiti.add_episode(
+                name=name,
+                episode_body=body,
+                source=EpisodeType.text,
+                source_description="memory_api",
+                reference_time=datetime.now(UTC),
+                group_id=group_id,
+            )
+
+        await self._enqueue_episode(group_id, process_episode)
+
+        return QueuedMemoryResponse(
+            message=f"Memory '{name}' queued for processing",
             group_id=group_id,
         )
 
-        return Memory(
-            id=result.episode.uuid,
-            content=body,
-            metadata={"group_id": group_id, **(request.metadata or {})},
-        )
+    async def _enqueue_episode(self, group_id: str, process_func: Callable[[], Awaitable[None]]) -> None:
+        if group_id not in self._queues:
+            self._queues[group_id] = asyncio.Queue()
+
+        await self._queues[group_id].put(process_func)
+
+        if group_id not in self._workers or self._workers[group_id].done():
+            self._workers[group_id] = asyncio.create_task(self._process_queue(group_id))
+
+    async def _process_queue(self, group_id: str) -> None:
+        logger.info("Starting queue worker for group_id: %s", group_id)
+
+        try:
+            while True:
+                try:
+                    process_func = await asyncio.wait_for(self._queues[group_id].get(), timeout=60.0)
+                except TimeoutError:
+                    if self._queues[group_id].empty():
+                        logger.info("Queue empty, stopping worker for: %s", group_id)
+                        break
+                    continue
+
+                try:
+                    await process_func()
+                except Exception:
+                    logger.exception("Error processing episode for group_id: %s", group_id)
+                finally:
+                    self._queues[group_id].task_done()
+        except asyncio.CancelledError:
+            logger.info("Queue worker cancelled for group_id: %s", group_id)
+        finally:
+            self._workers.pop(group_id, None)
 
     async def search(self, request: SearchMemoryRequest) -> list[Memory]:
         group_id = self._build_group_id(request.user_id, request.agent_id)
@@ -204,4 +252,10 @@ class GraphitiMemoryManager(MemoryManager):
         await self._graphiti.remove_episode(memory_id)
 
     async def close(self) -> None:
+        for task in self._workers.values():
+            task.cancel()
+        if self._workers:
+            await asyncio.gather(*self._workers.values(), return_exceptions=True)
+        self._workers.clear()
+        self._queues.clear()
         await self._graphiti.close()
