@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lunarr/models/sign_model.dart';
-import 'package:lunarr/views/workspace_view.dart';
+import 'package:lunarr/views/main_view.dart';
 
 class SignInView extends StatefulWidget {
   final void Function(int i) setIndex;
@@ -53,33 +53,34 @@ class _SignInViewState extends State<SignInView> {
           ),
           obscureText: _isPasswordObscured,
         ),
-        SizedBox(
-          width: double.infinity,
-          height: 40,
-          child: FilledButton(
-            onPressed: () {
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (context) => WorkspaceView()),
-              );
-            },
-            child: Text('Sign In'),
-          ),
+        Row(
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Expanded(
+              child: FilledButton(
+                onPressed: () {
+                  Navigator.of(context).pushReplacement(
+                    // MaterialPageRoute(builder: (context) => WorkspaceView()),
+                    MaterialPageRoute(builder: (context) => MainView()),
+                  );
+                },
+                child: Text('Sign In'),
+              ),
+            ),
+          ],
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           spacing: 8,
           children: [
             Text('New to Lunarr?'),
-            SizedBox(
-              height: 40,
-              child: TextButton(
-                onPressed: () {
-                  widget.setIndex(1);
-                },
-                child: Text(
-                  'Sign Up',
-                  style: tt.labelLarge?.copyWith(color: cs.onSurface),
-                ),
+            TextButton(
+              onPressed: () {
+                widget.setIndex(1);
+              },
+              child: Text(
+                'Sign Up',
+                style: tt.labelLarge?.copyWith(color: cs.onSurface),
               ),
             ),
           ],

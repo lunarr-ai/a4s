@@ -99,25 +99,19 @@ class _SignUp1ViewState extends State<SignUp1View> {
           spacing: 8,
           children: [
             Expanded(
-              child: SizedBox(
-                height: 40,
-                child: OutlinedButton(
-                  onPressed: () {
-                    widget.setIndex(0);
-                  },
-                  child: Text('Back'),
-                ),
+              child: OutlinedButton(
+                onPressed: () {
+                  widget.setIndex(0);
+                },
+                child: Text('Back'),
               ),
             ),
             Expanded(
-              child: SizedBox(
-                height: 40,
-                child: FilledButton(
-                  onPressed: () {
-                    widget.setIndex(2);
-                  },
-                  child: Text('Next'),
-                ),
+              child: FilledButton(
+                onPressed: () {
+                  widget.setIndex(2);
+                },
+                child: Text('Next'),
               ),
             ),
           ],

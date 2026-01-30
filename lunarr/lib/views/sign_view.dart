@@ -33,13 +33,15 @@ class _SignViewState extends State<SignView> {
         child: Center(
           child: Container(
             padding: const EdgeInsets.all(24),
-            constraints: BoxConstraints(maxHeight: 540, maxWidth: 480),
+            constraints: BoxConstraints(maxWidth: 480),
             decoration: BoxDecoration(
               color: cs.surface.withAlpha(128),
               borderRadius: BorderRadius.circular(24),
             ),
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              spacing: 24,
               children: [
                 EmblemWidget(tt: tt, cs: cs),
                 IndexedStack(

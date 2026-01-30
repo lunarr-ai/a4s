@@ -10,6 +10,9 @@ class MainView extends StatefulWidget {
 class _MainViewState extends State<MainView> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    ColorScheme cs = Theme.of(context).colorScheme;
+    TextTheme tt = Theme.of(context).textTheme;
+
+    return Scaffold();
   }
 }

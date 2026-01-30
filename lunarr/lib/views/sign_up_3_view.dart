@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lunarr/models/sign_model.dart';
-import 'package:lunarr/views/workspace_view.dart';
+import 'package:lunarr/views/main_view.dart';
 
 class SignUp3View extends StatefulWidget {
   final void Function(int i) setIndex;
@@ -52,27 +52,22 @@ class _SignUp3ViewState extends State<SignUp3View> {
           spacing: 8,
           children: [
             Expanded(
-              child: SizedBox(
-                height: 40,
-                child: OutlinedButton(
-                  onPressed: () {
-                    widget.setIndex(2);
-                  },
-                  child: Text('Back'),
-                ),
+              child: OutlinedButton(
+                onPressed: () {
+                  widget.setIndex(2);
+                },
+                child: Text('Back'),
               ),
             ),
             Expanded(
-              child: SizedBox(
-                height: 40,
-                child: FilledButton(
-                  onPressed: () {
-                    Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(builder: (context) => WorkspaceView()),
-                    );
-                  },
-                  child: Text('Next'),
-                ),
+              child: FilledButton(
+                onPressed: () {
+                  Navigator.of(context).pushReplacement(
+                    // MaterialPageRoute(builder: (context) => WorkspaceView()),
+                    MaterialPageRoute(builder: (context) => MainView()),
+                  );
+                },
+                child: Text('Next'),
               ),
             ),
           ],
