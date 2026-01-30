@@ -14,6 +14,7 @@ dev = [
     "api",
     "a4s-mcp",
     "e2e",
+    "personal-assistant",
 ]
 
 [tool.uv]
@@ -23,12 +24,14 @@ default-groups = ["dev"]
 api = { workspace = true }
 a4s-mcp = { workspace = true }
 e2e = { workspace = true }
+personal-assistant = { workspace = true }
 
 [tool.uv.workspace]
 members = [
     "api",
     "mcp",
     "e2e",
+    "agents/*",
 ]
 
 [tool.pytest.ini_options]

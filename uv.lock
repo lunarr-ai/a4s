@@ -13,6 +13,7 @@ members = [
     "a4s-mcp",
     "api",
     "e2e",
+    "personal-assistant",
 ]
 
 [[package]]
@@ -41,6 +42,7 @@ dev = [
     { name = "a4s-mcp" },
     { name = "api" },
     { name = "e2e" },
+    { name = "personal-assistant" },
     { name = "pre-commit" },
     { name = "pytest" },
     { name = "ruff" },
@@ -53,6 +55,7 @@ dev = [
     { name = "a4s-mcp", editable = "mcp" },
     { name = "api", editable = "api" },
     { name = "e2e", editable = "e2e" },
+    { name = "personal-assistant", editable = "agents/personal-assistant" },
     { name = "pre-commit", specifier = ">=4,<5" },
     { name = "pytest", specifier = ">=9,<10" },
     { name = "ruff", specifier = ">=0.14,<0.15" },
@@ -2582,6 +2585,11 @@ sdist = { url = "https://files.pythonhosted.org/packages/65/ee/299d360cdc32edc7d
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b7/b9/c538f279a4e237a006a2c98387d081e9eb060d203d8ed34467cc0f0b9b53/packaging-26.0-py3-none-any.whl", hash = "sha256:b36f1fef9334a5588b4166f8bcd26a14e521f2b55e6b9de3aaa80d3ff7a37529", size = 74366, upload-time = "2026-01-21T20:50:37.788Z" },
 ]
+
+[[package]]
+name = "personal-assistant"
+version = "0.1.0"
+source = { editable = "agents/personal-assistant" }
 
 [[package]]
 name = "pillow"
