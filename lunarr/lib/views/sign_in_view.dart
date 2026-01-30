@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lunarr/controllers/sign_controller.dart';
+import 'package:lunarr/models/sign_model.dart';
 import 'package:lunarr/views/workspace_view.dart';
 
 class SignInView extends StatefulWidget {
@@ -32,12 +32,12 @@ class _SignInViewState extends State<SignInView> {
       children: [
         TextField(
           controller: emailAddressController,
-          onChanged: (value) => SignController().signInEmailAddress = value,
+          onChanged: (value) => SignModel().signInEmailAddress = value,
           decoration: InputDecoration(labelText: 'Email address'),
         ),
         TextField(
           controller: passwordController,
-          onChanged: (value) => SignController().signInPassword = value,
+          onChanged: (value) => SignModel().signInPassword = value,
           decoration: InputDecoration(
             labelText: 'Password',
             suffixIcon: IconButton(

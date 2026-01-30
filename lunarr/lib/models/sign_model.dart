@@ -1,9 +1,9 @@
-class SignController {
-  SignController._internal();
+class SignModel {
+  SignModel._internal();
 
-  static final SignController _instance = SignController._internal();
+  static final SignModel _instance = SignModel._internal();
 
-  factory SignController() => _instance;
+  factory SignModel() => _instance;
 
   String? signInEmailAddress;
   String? signInPassword;
