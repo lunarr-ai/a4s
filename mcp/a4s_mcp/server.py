@@ -42,9 +42,10 @@ async def mcp_lifespan(_server: FastMCP) -> AsyncIterator[AppContext]:
 SERVER_INSTRUCTIONS = """A4S enables agent orchestration, skills, and memory.
 
 <agent-collaboration>
-To delegate work:
-1. Search for agents by capability
-2. Send a message to the selected agent
+To delegate work to other agents:
+1. Search for agents matching the task (use specific terms like "addition" not generic "math")
+2. Select agent(s) whose description directly matches the task
+3. Send the task to selected agent(s) and return their response(s)
 </agent-collaboration>
 
 <skills>
@@ -89,7 +90,7 @@ async def search_agents(
     query: str,
     limit: int = 10,
 ) -> dict:
-    """Search for agents by name or description.
+    """Search for agents by name, description, or capability.
 
     Args:
         query: Search query (e.g., "code review").
@@ -98,7 +99,11 @@ async def search_agents(
     client = ctx.request_context.lifespan_context.client
     resp = await client.get("/api/v1/agents/search", params={"query": query, "limit": limit})
     resp.raise_for_status()
-    return resp.json()
+    data = resp.json()
+    return {
+        "agents": [{"id": a["id"], "name": a["name"], "description": a["description"]} for a in data["agents"]],
+        "query": query,
+    }
 
 
 @mcp.tool()

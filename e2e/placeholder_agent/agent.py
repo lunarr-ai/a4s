@@ -47,8 +47,8 @@ def create_agent() -> LlmAgent:
     mcp_toolset = McpToolset(
         connection_params=StdioConnectionParams(
             server_params=StdioServerParameters(
-                command="uv",
-                args=["run", "-m", "a4s_mcp"],
+                command="python",
+                args=["-m", "a4s_mcp"],
                 env=mcp_env,
             ),
             timeout=180,

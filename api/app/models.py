@@ -47,6 +47,20 @@ class AgentStatus(str, Enum):
     ERROR = "error"
 
 
+class AgentMode(str, Enum):
+    SERVERLESS = "serverless"
+    PERMANENT = "permanent"
+
+
+class SpawnConfig(BaseModel):
+    """Configuration for spawning an agent container."""
+
+    image: str = Field(description="Docker image to use for the agent.")
+    model: AgentModel = Field(description="Model configuration for the agent.")
+    instruction: str = Field(default="", description="Instruction for the agent.")
+    tools: list[str] = Field(default_factory=list, description="Enabled tools for the agent.")
+
+
 class Agent(BaseModel):
     """Metadata for an AI agent runtime."""
 
@@ -59,3 +73,5 @@ class Agent(BaseModel):
     owner_id: str = Field(description="The ID of the agent's owner.")
     status: AgentStatus = Field(description="The status of the agent.", default=AgentStatus.PENDING)
     created_at: datetime = Field(description="The timestamp of the agent creation.", default_factory=datetime.now)
+    mode: AgentMode = Field(default=AgentMode.SERVERLESS, description="Runtime mode of the agent.")
+    spawn_config: SpawnConfig | None = Field(default=None, description="Configuration for spawning agent containers.")

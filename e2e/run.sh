@@ -132,10 +132,12 @@ register_agent() {
     local prefix="$1"
     local name_var="${prefix}_NAME"
     local desc_var="${prefix}_DESCRIPTION"
+    local instruction_var="${prefix}_INSTRUCTION"
     local id_var="${prefix}_ID"
 
     local name="${!name_var}"
     local description="${!desc_var}"
+    local instruction="${!instruction_var}"
 
     log_info "Registering agent: ${name}..."
 
@@ -146,7 +148,15 @@ register_agent() {
     "description": "${description}",
     "version": "${AGENT_VERSION}",
     "port": ${AGENT_PORT},
-    "owner_id": "e2e-test-owner"
+    "owner_id": "e2e-test-owner",
+    "spawn_config": {
+        "image": "${IMAGE_NAME}",
+        "model": {
+            "provider": "${MODEL_PROVIDER}",
+            "model_id": "${MODEL_ID}"
+        },
+        "instruction": $(echo "$instruction" | jq -Rs .)
+    }
 }
 EOF
 )
@@ -169,27 +179,14 @@ start_agent() {
     local prefix="$1"
     local name_var="${prefix}_NAME"
     local id_var="${prefix}_ID"
-    local instruction_var="${prefix}_INSTRUCTION"
 
     local name="${!name_var}"
     local agent_id="${!id_var}"
-    local instruction="${!instruction_var}"
 
     log_info "Starting agent ${name}..."
 
-    local payload
-    payload=$(cat <<EOF
-{
-    "image": "${IMAGE_NAME}",
-    "model_provider": "${MODEL_PROVIDER}",
-    "model_id": "${MODEL_ID}",
-    "instruction": $(echo "$instruction" | jq -Rs .)
-}
-EOF
-)
-
     local response
-    response=$(api_request POST "/api/v1/agents/${agent_id}/start" "$payload")
+    response=$(api_request POST "/api/v1/agents/${agent_id}/start")
 
     if echo "$response" | grep -q '"status"'; then
         local status

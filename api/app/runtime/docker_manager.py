@@ -17,7 +17,8 @@ logger = logging.getLogger(__name__)
 
 DEFAULT_BASE_URL = "unix:///var/run/docker.sock"
 DEFAULT_API_BASE_URL = "http://host.docker.internal:8000"
-DEFAULT_NETWORK = "a4s-agents"
+DEFAULT_NETWORK = "a4s-network"
+DEFAULT_AGENT_GATEWAY_URL = "http://localhost:8080"
 LABEL_PREFIX = "a4s"
 CONTAINER_PORT = 8000
 PASSTHROUGH_ENV_KEYS = ("GOOGLE_API_KEY", "OPENAI_API_KEY", "OPENROUTER_API_KEY")
@@ -29,16 +30,23 @@ class DockerRuntimeManager(RuntimeManager):
     Args:
         base_url: Docker daemon URL. Defaults to unix socket.
         network_name: Docker network name.
+        api_base_url: Base URL of the A4S API.
+        agent_gateway_url: Gateway URL for agent routing.
     """
 
     def __init__(
-        self, base_url: str | None = None, network_name: str = DEFAULT_NETWORK, api_base_url: str = DEFAULT_API_BASE_URL
+        self,
+        base_url: str | None = None,
+        network_name: str = DEFAULT_NETWORK,
+        api_base_url: str = DEFAULT_API_BASE_URL,
+        agent_gateway_url: str = DEFAULT_AGENT_GATEWAY_URL,
     ) -> None:
         self._client = DockerClient(base_url=base_url or DEFAULT_BASE_URL)
         self._network_name = network_name
         self._ensure_network()
 
         self._api_base_url = api_base_url
+        self._agent_gateway_url = agent_gateway_url
 
     def _container_name(self, agent_id: str) -> str:
         return f"a4s-agent-{agent_id}"
@@ -93,6 +101,7 @@ class DockerRuntimeManager(RuntimeManager):
                 "AGENT_INSTRUCTION": request.instruction,
                 "AGENT_TOOLS": ",".join(request.tools),
                 "A4S_API_URL": self._api_base_url,
+                "A4S_AGENT_URL": f"{self._agent_gateway_url}/agents/{request.agent_id}/",
             }
             for key in PASSTHROUGH_ENV_KEYS:
                 if os.environ.get(key):
