@@ -13,7 +13,6 @@ class AgentChatView extends StatefulWidget {
 }
 
 class _AgentChatViewState extends State<AgentChatView> {
-  final AgentModel am = AgentService().agentModel;
   final AgentChatController acc = AgentChatController();
 
   late Future<void> initFuture;
@@ -33,7 +32,7 @@ class _AgentChatViewState extends State<AgentChatView> {
       children: [
         Column(
           spacing: 24,
-          children: [_buildAppBar(am, tt, cs), _buildChat(cs, tt)],
+          children: [_buildAppBar(tt, cs), _buildChat(cs, tt)],
         ),
         _buildGradient(cs),
         _buildInput(cs, tt),
@@ -89,6 +88,7 @@ class _AgentChatViewState extends State<AgentChatView> {
   }
 
   Widget _buildInput(ColorScheme cs, TextTheme tt) {
+    final AgentModel am = AgentService().agentModel;
     return Align(
       alignment: Alignment.bottomCenter,
       child: Padding(
@@ -330,7 +330,8 @@ class _AgentChatViewState extends State<AgentChatView> {
     }
   }
 
-  Widget _buildAppBar(AgentModel agentModel, TextTheme tt, ColorScheme cs) {
+  Widget _buildAppBar(TextTheme tt, ColorScheme cs) {
+    final AgentModel am = AgentService().agentModel;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 12, 8),
       child: Row(
@@ -339,9 +340,9 @@ class _AgentChatViewState extends State<AgentChatView> {
           Row(
             spacing: 12,
             children: [
-              agentModel.getIcon(16),
+              am.getIcon(16),
               Text(
-                agentModel.labelString,
+                am.labelString,
                 style: tt.titleLarge?.copyWith(color: cs.onSurface),
               ),
             ],

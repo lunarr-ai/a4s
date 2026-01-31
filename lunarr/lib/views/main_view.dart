@@ -38,7 +38,10 @@ class _MainViewState extends State<MainView> {
           Expanded(
             child: IndexedStack(
               index: _selectedIndex < channelCount ? 0 : 1,
-              children: [ChannelChatView(), AgentChatView()],
+              children: [
+                ChannelChatView(key: ValueKey(_selectedIndex)),
+                AgentChatView(key: ValueKey(_selectedIndex - channelCount)),
+              ],
             ),
           ),
         ],

@@ -13,7 +13,6 @@ class ChannelChatView extends StatefulWidget {
 }
 
 class _ChannelChatViewState extends State<ChannelChatView> {
-  final ChannelModel cm = ChannelService().channelModel;
   final ChannelChatController ccc = ChannelChatController();
 
   late Future<void> initFuture;
@@ -33,7 +32,7 @@ class _ChannelChatViewState extends State<ChannelChatView> {
       children: [
         Column(
           spacing: 24,
-          children: [_buildAppBar(cm, tt, cs), _buildChat(cs, tt)],
+          children: [_buildAppBar(tt, cs), _buildChat(cs, tt)],
         ),
         _buildGradient(cs),
         _buildInput(cs, tt),
@@ -89,6 +88,7 @@ class _ChannelChatViewState extends State<ChannelChatView> {
   }
 
   Widget _buildInput(ColorScheme cs, TextTheme tt) {
+    final ChannelModel cm = ChannelService().channelModel;
     return Align(
       alignment: Alignment.bottomCenter,
       child: Padding(
@@ -330,7 +330,8 @@ class _ChannelChatViewState extends State<ChannelChatView> {
     }
   }
 
-  Widget _buildAppBar(ChannelModel channelModel, TextTheme tt, ColorScheme cs) {
+  Widget _buildAppBar(TextTheme tt, ColorScheme cs) {
+    final ChannelModel cm = ChannelService().channelModel;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 12, 8),
       child: Row(
@@ -339,9 +340,9 @@ class _ChannelChatViewState extends State<ChannelChatView> {
           Row(
             spacing: 12,
             children: [
-              channelModel.getIcon(16),
+              cm.getIcon(16),
               Text(
-                channelModel.labelString,
+                cm.labelString,
                 style: tt.titleLarge?.copyWith(color: cs.onSurface),
               ),
             ],
@@ -352,7 +353,7 @@ class _ChannelChatViewState extends State<ChannelChatView> {
                 icon: Icon(Icons.person, color: cs.onSurface),
                 onPressed: () {},
                 label: Text(
-                  '${channelModel.agentsCount}',
+                  '${cm.agentsCount}',
                   style: tt.labelLarge?.copyWith(color: cs.onSurface),
                 ),
               ),
