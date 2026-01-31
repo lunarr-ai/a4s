@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lunarr/models/agent_card_model.dart';
+import 'package:lunarr/models/channel_model.dart';
+import 'package:lunarr/services/channel_service.dart';
 
 class ChannelChatController {
   bool _lock = false;
@@ -13,6 +15,8 @@ class ChannelChatController {
 
   // TODO: integrate API (not for now)
   Future<void> fetchAgentCardModels() async {
+    final ChannelModel cm = ChannelService().channelModel;
+
     _agentCardModelss = [
       [
         AgentCardModel.seungho(false),
