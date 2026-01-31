@@ -47,10 +47,12 @@ class _ChannelChatViewState extends State<ChannelChatView> {
           ],
         ),
         IconButton(
-          onPressed: () async {
-            await ccc.getAgentCardModels();
-            setState(() {});
-          },
+          onPressed: ccc.lock
+              ? null
+              : () async {
+                  await ccc.getAgentCardModels();
+                  setState(() {});
+                },
           icon: Icon(Icons.send),
         ),
       ],

@@ -47,10 +47,12 @@ class _AgentChatViewState extends State<AgentChatView> {
           ],
         ),
         IconButton(
-          onPressed: () async {
-            await acc.getAgentCardModels();
-            setState(() {});
-          },
+          onPressed: acc.lock
+              ? null
+              : () async {
+                  await acc.getAgentCardModels();
+                  setState(() {});
+                },
           icon: Icon(Icons.send),
         ),
       ],
