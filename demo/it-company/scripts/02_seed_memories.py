@@ -91,7 +91,7 @@ def seed_agent_memories(client: httpx.Client, agent_id: str, agent_name: str) ->
     Returns:
         Number of memories seeded.
     """
-    seed_data = load_agent_seed_data(agent_id)
+    seed_data = load_agent_seed_data(agent_name)
     if not seed_data:
         print(f"  ⊘ No seed data found for {agent_name}")
         return 0
@@ -105,7 +105,7 @@ def seed_agent_memories(client: httpx.Client, agent_id: str, agent_name: str) ->
             add_memory(
                 client,
                 agent_id=agent_id,
-                requester_id=agent_id,
+                requester_id=agent_name,
                 memory_data=memory,
                 visibility="private",
             )
@@ -120,7 +120,7 @@ def seed_agent_memories(client: httpx.Client, agent_id: str, agent_name: str) ->
             add_memory(
                 client,
                 agent_id=agent_id,
-                requester_id=agent_id,
+                requester_id=agent_name,
                 memory_data=memory,
                 visibility="public",
             )
