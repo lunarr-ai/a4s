@@ -28,6 +28,7 @@ class AgentChatController {
   // TODO: integrate API
   Future<void> getAgentCardModels() async {
     if (_lock) return;
+    _lock = true;
 
     List<AgentCardModel> _agentCardModels = [
       AgentCardModel.seungho(true),
