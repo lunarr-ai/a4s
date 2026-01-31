@@ -13,7 +13,7 @@ class ChannelService {
   ChannelModel? _channelModel;
 
   List<ChannelModel>? get channelModels => _channelModels;
-  ChannelModel? get channelModel => _channelModel;
+  ChannelModel get channelModel => _channelModel ?? ChannelModel('', '', 0);
 
   // TODO: fetch channel models from user service and workspace service
   Future<void> fetchChannelModels() async {

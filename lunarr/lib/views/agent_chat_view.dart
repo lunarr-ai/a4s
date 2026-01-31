@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lunarr/models/agent_model.dart';
 import 'package:lunarr/services/agent_service.dart';
-import 'package:lunarr/widgets/agent_chat_app_bar_widget.dart';
 
 class AgentChatView extends StatefulWidget {
   const AgentChatView({super.key});
@@ -15,8 +14,34 @@ class _AgentChatViewState extends State<AgentChatView> {
   Widget build(BuildContext context) {
     ColorScheme cs = Theme.of(context).colorScheme;
     TextTheme tt = Theme.of(context).textTheme;
-    AgentModel agentModel = AgentService().agentModel!;
+    AgentModel agentModel = AgentService().agentModel;
 
-    return Column(children: [AgentChatAppBarWidget()]);
+    return Column(children: [_buildAppBar(agentModel, tt, cs)]);
+  }
+
+  Widget _buildAppBar(AgentModel agentModel, TextTheme tt, ColorScheme cs) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 12, 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            spacing: 12,
+            children: [
+              agentModel.getIcon(16),
+              Text(
+                agentModel.labelString,
+                style: tt.titleLarge?.copyWith(color: cs.onSurface),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              IconButton(onPressed: () {}, icon: Icon(Icons.more_vert)),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }

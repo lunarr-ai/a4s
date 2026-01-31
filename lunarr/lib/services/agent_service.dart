@@ -13,7 +13,7 @@ class AgentService {
   AgentModel? _agentModel;
 
   List<AgentModel>? get agentModels => _agentModels;
-  AgentModel? get agentModel => _agentModel;
+  AgentModel get agentModel => _agentModel ?? AgentModel('', '');
 
   // TODO: fetch agent models from user service and workspace service
   Future<void> fetchAgentModels() async {
@@ -21,9 +21,9 @@ class AgentService {
     WorkspaceService workspaceService = WorkspaceService();
 
     _agentModels = [
-      AgentModel('1', 'Seungho\'s Agent'),
-      AgentModel('2', 'Kyungho\'s Agent'),
-      AgentModel('4', 'Minseok\'s Agent'),
+      AgentModel('assets/avatars/1.png', 'Seungho\'s Agent'),
+      AgentModel('assets/avatars/2.png', 'Kyungho\'s Agent'),
+      AgentModel('assets/avatars/4.png', 'Minseok\'s Agent'),
     ];
     fetchAgentModel(0);
   }

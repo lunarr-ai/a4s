@@ -8,8 +8,6 @@ class AgentModel {
 
   // Widget getIcon(double radius) =>
   //     CircleAvatar(radius: radius, child: Image.network(iconString));
-  Widget getIcon(double radius) => CircleAvatar(
-    radius: radius,
-    child: Image.asset('assets/avatars/$iconString.png'),
-  );
+  Widget getIcon(double radius) =>
+      CircleAvatar(radius: radius, child: Image.asset(iconString));
 }

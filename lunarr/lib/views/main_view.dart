@@ -25,130 +25,127 @@ class _MainViewState extends State<MainView> {
     final int channelCount = channelModels.length;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Row(
         children: [
-          Container(
-            color: cs.surfaceContainerLow,
-            padding: EdgeInsets.all(12),
-            child: NavigationDrawer(
-              selectedIndex: _selectedIndex,
-              onDestinationSelected: (index) {
-                setState(() {
-                  _selectedIndex = index;
-                });
-                if (index < channelCount) {
-                  ChannelService().fetchChannelModel(index);
-                } else {
-                  AgentService().fetchAgentModel(index - channelCount);
-                }
-              },
-              header: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    spacing: 12,
-                    children: [
-                      CircleAvatar(radius: 16, child: Text('C')),
-                      Text(
-                        'C Company',
-                        style: tt.titleLarge?.copyWith(
-                          color: cs.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                  IconButton(
-                    onPressed: () {},
-                    icon: Icon(Icons.arrow_drop_down),
-                  ),
-                ],
-              ),
-              footer: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    spacing: 12,
-                    children: [
-                      CircleAvatar(
-                        radius: 16,
-                        child: Image.asset('assets/avatars/8.png'),
-                      ),
-                      Text(
-                        'Seungho Jang',
-                        style: tt.titleLarge?.copyWith(
-                          color: cs.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                  IconButton(
-                    onPressed: () {},
-                    icon: Icon(Icons.settings_outlined),
-                  ),
-                ],
-              ),
-              children: [
-                SizedBox(
-                  height: 56,
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Channels',
-                          style: tt.titleSmall?.copyWith(
-                            color: cs.onSurfaceVariant,
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () {},
-                          icon: Icon(Icons.more_vert),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                ...channelModels.map(
-                  (channelModel) => NavigationDrawerDestination(
-                    icon: channelModel.getIcon(12),
-                    label: Text(channelModel.labelString),
-                  ),
-                ),
-                SizedBox(
-                  height: 56,
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Agents',
-                          style: tt.titleSmall?.copyWith(
-                            color: cs.onSurfaceVariant,
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () {},
-                          icon: Icon(Icons.more_vert),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                ...agentModels.map(
-                  (agentModel) => NavigationDrawerDestination(
-                    icon: agentModel.getIcon(12),
-                    label: Text(agentModel.labelString),
-                  ),
-                ),
-              ],
-            ),
+          _buildNavigationDrawer(
+            cs,
+            tt,
+            channelModels,
+            agentModels,
+            channelCount,
           ),
           Expanded(
             child: IndexedStack(
               index: _selectedIndex < channelCount ? 0 : 1,
               children: [ChannelChatView(), AgentChatView()],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Container _buildNavigationDrawer(
+    ColorScheme cs,
+    TextTheme tt,
+    List<ChannelModel> channelModels,
+    List<AgentModel> agentModels,
+    int channelCount,
+  ) {
+    return Container(
+      color: cs.surfaceContainerLow,
+      padding: EdgeInsets.all(12),
+      child: NavigationDrawer(
+        selectedIndex: _selectedIndex,
+        onDestinationSelected: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+          if (index < channelCount) {
+            ChannelService().fetchChannelModel(index);
+          } else {
+            AgentService().fetchAgentModel(index - channelCount);
+          }
+        },
+        header: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              spacing: 12,
+              children: [
+                CircleAvatar(radius: 16, child: Text('C')),
+                Text(
+                  'C Company',
+                  style: tt.titleLarge?.copyWith(color: cs.onSurfaceVariant),
+                ),
+              ],
+            ),
+            IconButton(onPressed: () {}, icon: Icon(Icons.arrow_drop_down)),
+          ],
+        ),
+        footer: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              spacing: 12,
+              children: [
+                CircleAvatar(
+                  radius: 16,
+                  child: Image.asset('assets/avatars/8.png'),
+                ),
+                Text(
+                  'Seungho Jang',
+                  style: tt.titleLarge?.copyWith(color: cs.onSurfaceVariant),
+                ),
+              ],
+            ),
+            IconButton(onPressed: () {}, icon: Icon(Icons.settings_outlined)),
+          ],
+        ),
+        children: [
+          SizedBox(
+            height: 56,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Channels',
+                    style: tt.titleSmall?.copyWith(color: cs.onSurfaceVariant),
+                  ),
+                  IconButton(onPressed: () {}, icon: Icon(Icons.more_vert)),
+                ],
+              ),
+            ),
+          ),
+          ...channelModels.map(
+            (channelModel) => NavigationDrawerDestination(
+              icon: channelModel.getIcon(12),
+              label: Text(channelModel.labelString),
+            ),
+          ),
+          SizedBox(
+            height: 56,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Agents',
+                    style: tt.titleSmall?.copyWith(color: cs.onSurfaceVariant),
+                  ),
+                  IconButton(onPressed: () {}, icon: Icon(Icons.more_vert)),
+                ],
+              ),
+            ),
+          ),
+          ...agentModels.map(
+            (agentModel) => NavigationDrawerDestination(
+              icon: agentModel.getIcon(12),
+              label: Text(agentModel.labelString),
             ),
           ),
         ],
