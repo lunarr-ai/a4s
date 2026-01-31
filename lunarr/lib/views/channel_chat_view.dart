@@ -28,20 +28,29 @@ class _ChannelChatViewState extends State<ChannelChatView> {
           children: [
             _buildAppBar(cm, tt, cs),
             Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  spacing: 24,
-                  children: [
-                    ...ccc.agentCardModelss.map(
-                      (acms) => _buildAgentCards(
-                        acms,
-                        cs,
-                        tt,
-                        ccc.lock && acms == ccc.agentCardModelss.last,
-                      ),
+              child: FutureBuilder(
+                future: ccc.fetchAgentCardModels(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+                  return SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      spacing: 24,
+                      children: [
+                        ...ccc.agentCardModelss.map(
+                          (acms) => _buildAgentCards(
+                            acms,
+                            cs,
+                            tt,
+                            ccc.lock && acms == ccc.agentCardModelss.last,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  );
+                },
               ),
             ),
           ],
@@ -88,12 +97,12 @@ class _ChannelChatViewState extends State<ChannelChatView> {
         isConfirmed.dispose();
       }
 
-      return SizedBox(
-        width: 720,
-        child: Column(
-          spacing: 24,
-          children: [
-            Row(
+      return Column(
+        spacing: 24,
+        children: [
+          SizedBox(
+            width: 720,
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 ValueListenableBuilder<int>(
@@ -122,19 +131,34 @@ class _ChannelChatViewState extends State<ChannelChatView> {
                 ),
               ],
             ),
-            Column(
-              spacing: 8,
-              children: [
-                for (int i = 0; i < acms.length; i += 2)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    spacing: 8,
-                    children: [
+          ),
+          Column(
+            spacing: 8,
+            children: [
+              for (int i = 0; i < acms.length; i += 2)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  spacing: 8,
+                  children: [
+                    ValueListenableBuilder<bool>(
+                      valueListenable: isConfirmed,
+                      builder: (context, value, child) {
+                        return AgentCardWidget(
+                          agentCardModel: acms[i],
+                          onTap: isConfirmed.value
+                              ? null
+                              : () {
+                                  updateAreSelectedCount();
+                                },
+                        );
+                      },
+                    ),
+                    if (i + 1 < acms.length) ...[
                       ValueListenableBuilder<bool>(
                         valueListenable: isConfirmed,
                         builder: (context, value, child) {
                           return AgentCardWidget(
-                            agentCardModel: acms[i],
+                            agentCardModel: acms[i + 1],
                             onTap: isConfirmed.value
                                 ? null
                                 : () {
@@ -143,35 +167,20 @@ class _ChannelChatViewState extends State<ChannelChatView> {
                           );
                         },
                       ),
-                      if (i + 1 < acms.length) ...[
-                        ValueListenableBuilder<bool>(
-                          valueListenable: isConfirmed,
-                          builder: (context, value, child) {
-                            return AgentCardWidget(
-                              agentCardModel: acms[i + 1],
-                              onTap: isConfirmed.value
-                                  ? null
-                                  : () {
-                                      updateAreSelectedCount();
-                                    },
-                            );
-                          },
-                        ),
-                      ],
                     ],
-                  ),
-              ],
-            ),
-          ],
-        ),
+                  ],
+                ),
+            ],
+          ),
+        ],
       );
     } else {
-      return SizedBox(
-        width: 720,
-        child: Column(
-          spacing: 24,
-          children: [
-            Row(
+      return Column(
+        spacing: 24,
+        children: [
+          SizedBox(
+            width: 720,
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
@@ -181,24 +190,24 @@ class _ChannelChatViewState extends State<ChannelChatView> {
                 FilledButton(onPressed: null, child: Text('Confirm')),
               ],
             ),
-            Column(
-              spacing: 8,
-              children: [
-                for (int i = 0; i < acms.length; i += 2)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    spacing: 8,
-                    children: [
-                      AgentCardWidget(agentCardModel: acms[i]),
-                      if (i + 1 < acms.length) ...[
-                        AgentCardWidget(agentCardModel: acms[i + 1]),
-                      ],
+          ),
+          Column(
+            spacing: 8,
+            children: [
+              for (int i = 0; i < acms.length; i += 2)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  spacing: 8,
+                  children: [
+                    AgentCardWidget(agentCardModel: acms[i]),
+                    if (i + 1 < acms.length) ...[
+                      AgentCardWidget(agentCardModel: acms[i + 1]),
                     ],
-                  ),
-              ],
-            ),
-          ],
-        ),
+                  ],
+                ),
+            ],
+          ),
+        ],
       );
     }
   }
