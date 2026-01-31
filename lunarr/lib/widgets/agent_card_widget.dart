@@ -3,10 +3,10 @@ import 'package:lunarr/models/agent_card_model.dart';
 import 'package:lunarr/widgets/agent_card_dialog_widget.dart';
 
 class AgentCardWidget extends StatefulWidget {
-  final AgentCardModel agentCardModel;
+  final AgentCardModel acm;
   final VoidCallback? onTap;
 
-  const AgentCardWidget({super.key, required this.agentCardModel, this.onTap});
+  const AgentCardWidget({super.key, required this.acm, this.onTap});
 
   @override
   State<AgentCardWidget> createState() => _AgentCardWidgetState();
@@ -25,9 +25,7 @@ class _AgentCardWidgetState extends State<AgentCardWidget> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
           side: BorderSide(
-            color: widget.agentCardModel.isSelected
-                ? cs.primary
-                : cs.outlineVariant,
+            color: widget.acm.isSelected ? cs.primary : cs.outlineVariant,
           ),
         ),
         child: InkWell(
@@ -35,8 +33,7 @@ class _AgentCardWidgetState extends State<AgentCardWidget> {
           onTap: widget.onTap != null
               ? () {
                   setState(() {
-                    widget.agentCardModel.isSelected =
-                        !widget.agentCardModel.isSelected;
+                    widget.acm.isSelected = !widget.acm.isSelected;
                     widget.onTap?.call();
                   });
                 }
@@ -54,20 +51,20 @@ class _AgentCardWidgetState extends State<AgentCardWidget> {
                       children: [
                         CircleAvatar(
                           radius: 20,
-                          child: Image.asset(widget.agentCardModel.iconString),
+                          child: Image.asset(widget.acm.iconString),
                         ),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              widget.agentCardModel.name,
+                              widget.acm.name,
                               style: tt.titleMedium?.copyWith(
                                 color: cs.onSurface,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             Text(
-                              widget.agentCardModel.distributionList,
+                              widget.acm.distributionList,
                               style: tt.bodyMedium?.copyWith(
                                 color: cs.onSurface,
                               ),
@@ -91,7 +88,7 @@ class _AgentCardWidgetState extends State<AgentCardWidget> {
                                   controller.open();
                                 }
                               },
-                              icon: const Icon(Icons.more_vert),
+                              icon: Icon(Icons.more_vert),
                               tooltip: 'Show menu',
                             );
                           },
@@ -99,9 +96,8 @@ class _AgentCardWidgetState extends State<AgentCardWidget> {
                         MenuItemButton(
                           onPressed: () => showDialog(
                             context: context,
-                            builder: (context) => AgentCardDialogWidget(
-                              agent: widget.agentCardModel,
-                            ),
+                            builder: (context) =>
+                                AgentCardDialogWidget(acm: widget.acm),
                           ),
                           child: const Text('Details'),
                         ),
@@ -113,7 +109,7 @@ class _AgentCardWidgetState extends State<AgentCardWidget> {
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Text(
-                  widget.agentCardModel.description,
+                  widget.acm.description,
                   style: tt.bodyMedium?.copyWith(color: cs.onSurface),
                 ),
               ),

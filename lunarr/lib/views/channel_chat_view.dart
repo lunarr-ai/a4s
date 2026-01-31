@@ -70,7 +70,7 @@ class _ChannelChatViewState extends State<ChannelChatView> {
                   await ccc.getAgentCardModels();
                   setState(() {});
                 },
-          icon: Icon(Icons.send),
+          icon: Icon(Icons.send, color: cs.onSurface),
         ),
       ],
     );
@@ -152,7 +152,7 @@ class _ChannelChatViewState extends State<ChannelChatView> {
                       valueListenable: isConfirmed,
                       builder: (context, value, child) {
                         return AgentCardWidget(
-                          agentCardModel: acms[i],
+                          acm: acms[i],
                           onTap: isConfirmed.value
                               ? null
                               : () {
@@ -166,7 +166,7 @@ class _ChannelChatViewState extends State<ChannelChatView> {
                         valueListenable: isConfirmed,
                         builder: (context, value, child) {
                           return AgentCardWidget(
-                            agentCardModel: acms[i + 1],
+                            acm: acms[i + 1],
                             onTap: isConfirmed.value
                                 ? null
                                 : () {
@@ -207,9 +207,9 @@ class _ChannelChatViewState extends State<ChannelChatView> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   spacing: 8,
                   children: [
-                    AgentCardWidget(agentCardModel: acms[i]),
+                    AgentCardWidget(acm: acms[i]),
                     if (i + 1 < acms.length) ...[
-                      AgentCardWidget(agentCardModel: acms[i + 1]),
+                      AgentCardWidget(acm: acms[i + 1]),
                     ],
                   ],
                 ),
@@ -239,11 +239,14 @@ class _ChannelChatViewState extends State<ChannelChatView> {
           Row(
             children: [
               TextButton.icon(
-                icon: Icon(Icons.person),
+                icon: Icon(Icons.person, color: cs.onSurface),
                 onPressed: () {},
                 label: Text('${channelModel.agentsCount}'),
               ),
-              IconButton(onPressed: () {}, icon: Icon(Icons.more_vert)),
+              IconButton(
+                onPressed: () {},
+                icon: Icon(Icons.more_vert, color: cs.onSurface),
+              ),
             ],
           ),
         ],

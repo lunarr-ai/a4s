@@ -81,7 +81,10 @@ class _MainViewState extends State<MainView> {
                 ),
               ],
             ),
-            IconButton(onPressed: () {}, icon: Icon(Icons.arrow_drop_down)),
+            IconButton(
+              onPressed: () {},
+              icon: Icon(Icons.arrow_drop_down, color: cs.onSurface),
+            ),
           ],
         ),
         footer: Row(
@@ -100,7 +103,10 @@ class _MainViewState extends State<MainView> {
                 ),
               ],
             ),
-            IconButton(onPressed: () {}, icon: Icon(Icons.settings_outlined)),
+            IconButton(
+              onPressed: () {},
+              icon: Icon(Icons.settings_outlined, color: cs.onSurface),
+            ),
           ],
         ),
         children: [
@@ -115,7 +121,10 @@ class _MainViewState extends State<MainView> {
                     'Channels',
                     style: tt.titleSmall?.copyWith(color: cs.onSurfaceVariant),
                   ),
-                  IconButton(onPressed: () {}, icon: Icon(Icons.more_vert)),
+                  IconButton(
+                    onPressed: () {},
+                    icon: Icon(Icons.more_vert, color: cs.onSurface),
+                  ),
                 ],
               ),
             ),
@@ -137,7 +146,10 @@ class _MainViewState extends State<MainView> {
                     'Agents',
                     style: tt.titleSmall?.copyWith(color: cs.onSurfaceVariant),
                   ),
-                  IconButton(onPressed: () {}, icon: Icon(Icons.more_vert)),
+                  IconButton(
+                    onPressed: () {},
+                    icon: Icon(Icons.more_vert, color: cs.onSurface),
+                  ),
                 ],
               ),
             ),
