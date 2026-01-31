@@ -1,0 +1,27 @@
+{
+  "agent_id": "carol-kim",
+  "private_memories": [
+    {
+      "name": "Learning Focus Q1",
+      "episode_body": "Working on understanding distributed systems patterns. Want to contribute more to payment service migration. Studying Kafka event streaming and PostgreSQL query optimization.",
+      "knowledge_type": "preference"
+    }
+  ],
+  "public_memories": [
+    {
+      "name": "Carol Kim - Associate Backend Engineer",
+      "episode_body": "Carol Kim is Associate Backend Engineer on Backend Team at TechFlow Solutions, reporting to Alice Chen. Developing expertise in API development, database optimization, and microservices. 2 years backend engineering experience. Working on payment service migration.",
+      "knowledge_type": "entity"
+    },
+    {
+      "name": "Database Optimization Work",
+      "episode_body": "Recently optimized slow queries in payment transaction table by adding composite index on (user_id, created_at). Reduced query time from 800ms to 45ms. Also implemented database connection pooling with SQLAlchemy to handle higher concurrency.",
+      "knowledge_type": "fact"
+    },
+    {
+      "name": "API Development Contribution",
+      "episode_body": "Built refund API endpoint for payment service. Supports full and partial refunds with idempotency. Validates refund amount against original charge. Returns refund ID and status. Integrated with Stripe refund API.",
+      "knowledge_type": "fact"
+    }
+  ]
+}

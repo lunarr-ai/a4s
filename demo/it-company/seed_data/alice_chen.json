@@ -1,0 +1,52 @@
+{
+  "agent_id": "alice-chen",
+  "private_memories": [
+    {
+      "name": "Team Performance Review Q1 2026",
+      "episode_body": "Performance review conducted January 2026. Bob Martinez delivers high-quality code consistently but needs to improve documentation practices. Carol Kim has shown strong growth and is ready for more complex tasks involving distributed systems. David Patel excels at API design and has received positive feedback from frontend team on clear documentation.",
+      "knowledge_type": "episode"
+    },
+    {
+      "name": "Personal Leadership Goals",
+      "episode_body": "Focus areas for Q1 2026: Improve delegation to empower team autonomy. Spend more time on architectural planning and less on code reviews. Build stronger cross-team relationships with Frontend and DevOps leads.",
+      "knowledge_type": "preference"
+    },
+    {
+      "name": "Team Work Patterns Observed",
+      "episode_body": "Team is most productive during morning hours 9-12 AM for deep work. Code reviews get best engagement in early afternoon 2-4 PM. Friday afternoons are low productivity, good for planning and retrospectives.",
+      "knowledge_type": "pattern"
+    }
+  ],
+  "public_memories": [
+    {
+      "name": "Alice Chen - Backend Team Manager",
+      "episode_body": "Alice Chen is Engineering Manager for Backend Team at TechFlow Solutions. Manages Bob Martinez (Senior), Carol Kim (Associate), and David Patel (Associate). Expert in payment systems, microservices architecture, and API design. 8 years of backend engineering experience, 2 years in management.",
+      "knowledge_type": "entity"
+    },
+    {
+      "name": "Payment Service Migration Project",
+      "episode_body": "Backend team is migrating the monolithic payment service to microservices architecture. Using event-driven patterns with Apache Kafka for inter-service communication. Target completion date: March 15, 2026. Current status: 40% complete as of January 2026.",
+      "knowledge_type": "fact"
+    },
+    {
+      "name": "Payment Service Architecture Decision",
+      "episode_body": "Team decided on January 20, 2026 to use event-driven microservices pattern for payment processing. Key decision: Kafka for event streaming, PostgreSQL for transaction data, Redis for caching. This ensures scalability and fault tolerance.",
+      "knowledge_type": "episode"
+    },
+    {
+      "name": "Backend Tech Stack",
+      "episode_body": "Backend team uses Python 3.11+ with FastAPI framework, PostgreSQL for relational data, Redis for caching and session management, Apache Kafka for event streaming, Docker for containerization, pytest for testing. All services follow RESTful API design principles.",
+      "knowledge_type": "fact"
+    },
+    {
+      "name": "Code Review Standards",
+      "episode_body": "All pull requests require at least one approval from team member. PRs should be reviewed within 24 hours. Reviews must check for: code quality, test coverage (minimum 80%), documentation, security vulnerabilities, and performance implications.",
+      "knowledge_type": "fact"
+    },
+    {
+      "name": "API Gateway Pattern",
+      "episode_body": "API Gateway is a single entry point for all client requests that routes to appropriate microservices. It handles cross-cutting concerns like authentication, rate limiting, and request logging. TechFlow uses Kong as API gateway.",
+      "knowledge_type": "definition"
+    }
+  ]
+}

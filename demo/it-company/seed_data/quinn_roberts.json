@@ -1,0 +1,57 @@
+{
+  "agent_id": "quinn-roberts",
+  "private_memories": [
+    {
+      "name": "Skill Development Focus",
+      "episode_body": "Want to improve design systems thinking and component API design. Learning animation principles for micro-interactions. Goal: become design system specialist. Planning to study Radix UI and Chakra UI for inspiration.",
+      "knowledge_type": "preference"
+    },
+    {
+      "name": "Design Workflow",
+      "episode_body": "Prefer to work on visual design in afternoon when energy is high for detail work. Use morning for meetings and component documentation. Like to collaborate with Emily (Frontend) on implementation details - she gives great feedback on feasibility.",
+      "knowledge_type": "pattern"
+    }
+  ],
+  "public_memories": [
+    {
+      "name": "Quinn Roberts - UI Designer",
+      "episode_body": "Quinn Roberts is UI Designer on Design Team at TechFlow Solutions, reporting to Olivia Taylor. Focuses on visual design, component design, design systems maintenance, and ensuring pixel-perfect implementation. 3 years UI design experience. Maintains TechFlow Design System.",
+      "knowledge_type": "entity"
+    },
+    {
+      "name": "Checkout UI Components",
+      "episode_body": "Checkout flow uses these components from design system: Card component (for section containers with elevation), Button (primary for submit, secondary for back), FormField (text input, dropdown, checkbox variants), PaymentMethodSelector (custom component with radio buttons and logos), ProgressIndicator (shows 3 steps). All components support dark mode and responsive breakpoints.",
+      "knowledge_type": "fact"
+    },
+    {
+      "name": "Design Tokens - Colors and Spacing",
+      "episode_body": "Brand colors: Primary #007AFF (blue for CTAs), Success #34C759 (green for confirmations), Error #FF3B30 (red for errors), Warning #FF9500 (orange for warnings), Neutral grays from #F2F2F7 to #1C1C1E. Spacing scale uses 8px base grid: 4px, 8px, 16px, 24px, 32px, 48px, 64px. Typography: Inter font family, weights 400/500/600/700, sizes 12px-32px.",
+      "knowledge_type": "fact"
+    },
+    {
+      "name": "Payment Method Selector Design",
+      "episode_body": "Designed custom PaymentMethodSelector component for checkout. Shows 3 payment options as large cards with: payment provider logo (60x40px), option name (e.g., 'Credit or Debit Card'), brief description, radio button for selection. Selected state: blue border (2px) and background tint (#007AFF10). Hover state: subtle elevation. Mobile: stacks vertically, desktop: 3 columns.",
+      "knowledge_type": "fact"
+    },
+    {
+      "name": "Loading States and Feedback",
+      "episode_body": "For payment processing, designed loading state: submit button shows spinner with text 'Processing payment...', disable all form fields, show subtle overlay to prevent edits. Success state: green checkmark icon with 'Payment successful' message, auto-redirect after 2 seconds. Error state: red error banner at top with retry button, keep form editable.",
+      "knowledge_type": "fact"
+    },
+    {
+      "name": "Responsive Design Breakpoints",
+      "episode_body": "Design system uses these breakpoints: Mobile (<640px), Tablet (640-1024px), Desktop (>1024px). Checkout flow: Mobile uses single column layout with full-width buttons. Tablet/Desktop uses centered 600px container with max-width. Forms adapt: 2-column on desktop for name/email, single column on mobile.",
+      "knowledge_type": "fact"
+    },
+    {
+      "name": "Design System Component Library",
+      "episode_body": "TechFlow Design System component library built with React and TypeScript. Uses styled-components for styling. Published as npm package @techflow/ui. Includes 50+ components, Storybook for documentation, automated visual regression tests. Frontend team imports components for consistent UI.",
+      "knowledge_type": "fact"
+    },
+    {
+      "name": "Micro-interactions in UI Design",
+      "episode_body": "Micro-interactions are small animations that provide feedback to user actions. Examples: button press animation (scale 0.98 on click), input field focus (border color transition), loading spinner (rotation animation), success checkmark (scale in with bounce). Checkout uses subtle micro-interactions for better user experience without being distracting.",
+      "knowledge_type": "definition"
+    }
+  ]
+}

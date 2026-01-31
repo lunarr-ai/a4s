@@ -1,0 +1,27 @@
+{
+  "agent_id": "kate-thompson",
+  "private_memories": [
+    {
+      "name": "QA Strategy Planning",
+      "episode_body": "Focus on expanding E2E test coverage and improving test automation frameworks. Luis is doing well on test automation. Need to hire senior QA engineer for test architecture.",
+      "knowledge_type": "preference"
+    }
+  ],
+  "public_memories": [
+    {
+      "name": "Kate Thompson - QA Lead",
+      "episode_body": "Kate Thompson is QA Lead at TechFlow Solutions, leading the QA Team. Expert in test automation, quality assurance processes, and end-to-end testing strategies. 7 years QA experience. Manages Luis Rodriguez. Ensures quality across all releases.",
+      "knowledge_type": "entity"
+    },
+    {
+      "name": "Testing Strategy",
+      "episode_body": "Multi-layer testing approach: unit tests (pytest for backend, Vitest for frontend), integration tests (API testing), E2E tests (Playwright). Minimum 80% code coverage required. All PRs must pass tests before merge. E2E tests run on every deployment to staging.",
+      "knowledge_type": "fact"
+    },
+    {
+      "name": "Checkout Flow Test Plan",
+      "episode_body": "E2E test scenarios for checkout: happy path (complete purchase), payment failure handling, form validation errors, session persistence, mobile responsive behavior, accessibility compliance. Testing across browsers: Chrome, Firefox, Safari. Mobile testing on iOS and Android.",
+      "knowledge_type": "fact"
+    }
+  ]
+}
