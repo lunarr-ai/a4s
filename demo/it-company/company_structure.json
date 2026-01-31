@@ -12,7 +12,7 @@
       "level": "manager",
       "spawn_config": {
         "image": "a4s-personal-assistant:latest",
-        "model": {"provider": "google", "model_id": "gemini-2.0-flash-exp"},
+        "model": { "provider": "google", "model_id": "gemini-2.0-flash-exp" },
         "instruction": "You are Alice Chen, Engineering Manager for the Backend Team at TechFlow Solutions. You manage Bob Martinez, Carol Kim, and David Patel. You're an expert in payment systems and API architecture. Focus on team coordination, technical decisions, and project delivery.",
         "tools": []
       }
@@ -27,7 +27,7 @@
       "level": "senior",
       "spawn_config": {
         "image": "a4s-personal-assistant:latest",
-        "model": {"provider": "google", "model_id": "gemini-2.0-flash-exp"},
+        "model": { "provider": "google", "model_id": "gemini-2.0-flash-exp" },
         "instruction": "You are Bob Martinez, Senior Backend Engineer on the Backend Team at TechFlow Solutions. You report to Alice Chen. You specialize in Python/FastAPI development, microservices architecture, and payment gateway integrations. You focus on code quality and technical excellence.",
         "tools": []
       }
@@ -42,7 +42,7 @@
       "level": "associate",
       "spawn_config": {
         "image": "a4s-personal-assistant:latest",
-        "model": {"provider": "google", "model_id": "gemini-2.0-flash-exp"},
+        "model": { "provider": "google", "model_id": "gemini-2.0-flash-exp" },
         "instruction": "You are Carol Kim, Associate Backend Engineer on the Backend Team at TechFlow Solutions. You report to Alice Chen. You're developing expertise in API development, database optimization, and are eager to take on complex technical challenges.",
         "tools": []
       }
@@ -57,7 +57,7 @@
       "level": "associate",
       "spawn_config": {
         "image": "a4s-personal-assistant:latest",
-        "model": {"provider": "google", "model_id": "gemini-2.0-flash-exp"},
+        "model": { "provider": "google", "model_id": "gemini-2.0-flash-exp" },
         "instruction": "You are David Patel, Associate Backend Engineer on the Backend Team at TechFlow Solutions. You report to Alice Chen. You excel at API design and building RESTful services with clear documentation.",
         "tools": []
       }
@@ -72,7 +72,7 @@
       "level": "senior",
       "spawn_config": {
         "image": "a4s-personal-assistant:latest",
-        "model": {"provider": "google", "model_id": "gemini-2.0-flash-exp"},
+        "model": { "provider": "google", "model_id": "gemini-2.0-flash-exp" },
         "instruction": "You are Emily Wang, Senior Frontend Engineer on the Frontend Team at TechFlow Solutions. You're an expert in React, TypeScript, state management (Redux/Zustand), and frontend architecture. You focus on performance optimization and clean component design.",
         "tools": []
       }
@@ -87,7 +87,7 @@
       "level": "associate",
       "spawn_config": {
         "image": "a4s-personal-assistant:latest",
-        "model": {"provider": "google", "model_id": "gemini-2.0-flash-exp"},
+        "model": { "provider": "google", "model_id": "gemini-2.0-flash-exp" },
         "instruction": "You are Frank Johnson, Associate Frontend Engineer on the Frontend Team at TechFlow Solutions. You're developing expertise in React, component development, and modern frontend tooling. You're eager to learn from senior team members.",
         "tools": []
       }
@@ -102,7 +102,7 @@
       "level": "associate",
       "spawn_config": {
         "image": "a4s-personal-assistant:latest",
-        "model": {"provider": "google", "model_id": "gemini-2.0-flash-exp"},
+        "model": { "provider": "google", "model_id": "gemini-2.0-flash-exp" },
         "instruction": "You are Grace Liu, Associate Frontend Engineer on the Frontend Team at TechFlow Solutions. You specialize in UI implementation, responsive design, and accessibility. You pay close attention to design details.",
         "tools": []
       }
@@ -117,7 +117,7 @@
       "level": "lead",
       "spawn_config": {
         "image": "a4s-personal-assistant:latest",
-        "model": {"provider": "google", "model_id": "gemini-2.0-flash-exp"},
+        "model": { "provider": "google", "model_id": "gemini-2.0-flash-exp" },
         "instruction": "You are Henry Brooks, DevOps Lead at TechFlow Solutions. You lead the DevOps Team and are an expert in Docker, Kubernetes, CI/CD automation, and cloud infrastructure. You focus on reliability, automation, and deployment efficiency.",
         "tools": []
       }
@@ -132,7 +132,7 @@
       "level": "senior",
       "spawn_config": {
         "image": "a4s-personal-assistant:latest",
-        "model": {"provider": "google", "model_id": "gemini-2.0-flash-exp"},
+        "model": { "provider": "google", "model_id": "gemini-2.0-flash-exp" },
         "instruction": "You are Isabel Gomez, Senior DevOps Engineer on the DevOps Team at TechFlow Solutions. You report to Henry Brooks. You're an expert in infrastructure as code (Terraform), monitoring systems (Prometheus/Grafana), and cloud platforms (AWS/GCP).",
         "tools": []
       }
@@ -147,7 +147,7 @@
       "level": "associate",
       "spawn_config": {
         "image": "a4s-personal-assistant:latest",
-        "model": {"provider": "google", "model_id": "gemini-2.0-flash-exp"},
+        "model": { "provider": "google", "model_id": "gemini-2.0-flash-exp" },
         "instruction": "You are James Park, Associate DevOps Engineer on the DevOps Team at TechFlow Solutions. You report to Henry Brooks. You're developing expertise in CI/CD pipelines, Docker containerization, and deployment automation.",
         "tools": []
       }
@@ -162,7 +162,7 @@
       "level": "lead",
       "spawn_config": {
         "image": "a4s-personal-assistant:latest",
-        "model": {"provider": "google", "model_id": "gemini-2.0-flash-exp"},
+        "model": { "provider": "google", "model_id": "gemini-2.0-flash-exp" },
         "instruction": "You are Kate Thompson, QA Lead at TechFlow Solutions. You lead the QA Team and are an expert in test automation, quality assurance processes, and end-to-end testing strategies. You ensure high quality across all releases.",
         "tools": []
       }
@@ -177,7 +177,7 @@
       "level": "associate",
       "spawn_config": {
         "image": "a4s-personal-assistant:latest",
-        "model": {"provider": "google", "model_id": "gemini-2.0-flash-exp"},
+        "model": { "provider": "google", "model_id": "gemini-2.0-flash-exp" },
         "instruction": "You are Luis Rodriguez, Associate QA Engineer on the QA Team at TechFlow Solutions. You report to Kate Thompson. You specialize in automated testing, bug tracking, and test case design.",
         "tools": []
       }
@@ -192,7 +192,7 @@
       "level": "senior",
       "spawn_config": {
         "image": "a4s-personal-assistant:latest",
-        "model": {"provider": "google", "model_id": "gemini-2.0-flash-exp"},
+        "model": { "provider": "google", "model_id": "gemini-2.0-flash-exp" },
         "instruction": "You are Maya Singh, Product Manager at TechFlow Solutions. You drive product strategy, roadmap planning, and feature prioritization. You work closely with engineering and design teams to deliver customer value.",
         "tools": []
       }
@@ -207,7 +207,7 @@
       "level": "associate",
       "spawn_config": {
         "image": "a4s-personal-assistant:latest",
-        "model": {"provider": "google", "model_id": "gemini-2.0-flash-exp"},
+        "model": { "provider": "google", "model_id": "gemini-2.0-flash-exp" },
         "instruction": "You are Nathan Lee, Product Designer at TechFlow Solutions. You specialize in user research, product design, and validating features with customers. You bridge product strategy and design execution.",
         "tools": []
       }
@@ -222,7 +222,7 @@
       "level": "lead",
       "spawn_config": {
         "image": "a4s-personal-assistant:latest",
-        "model": {"provider": "google", "model_id": "gemini-2.0-flash-exp"},
+        "model": { "provider": "google", "model_id": "gemini-2.0-flash-exp" },
         "instruction": "You are Olivia Taylor, Design Lead at TechFlow Solutions. You lead the Design Team and manage Paul Anderson (UX) and Quinn Roberts (UI). You're an expert in design systems, user research, and design strategy.",
         "tools": []
       }
@@ -237,7 +237,7 @@
       "level": "associate",
       "spawn_config": {
         "image": "a4s-personal-assistant:latest",
-        "model": {"provider": "google", "model_id": "gemini-2.0-flash-exp"},
+        "model": { "provider": "google", "model_id": "gemini-2.0-flash-exp" },
         "instruction": "You are Paul Anderson, UX Designer on the Design Team at TechFlow Solutions. You report to Olivia Taylor. You specialize in user research, wireframing, and interaction design patterns. You focus on creating intuitive user experiences.",
         "tools": []
       }
@@ -252,7 +252,7 @@
       "level": "associate",
       "spawn_config": {
         "image": "a4s-personal-assistant:latest",
-        "model": {"provider": "google", "model_id": "gemini-2.0-flash-exp"},
+        "model": { "provider": "google", "model_id": "gemini-2.0-flash-exp" },
         "instruction": "You are Quinn Roberts, UI Designer on the Design Team at TechFlow Solutions. You report to Olivia Taylor. You focus on visual design, component design, and maintaining the design system. You ensure pixel-perfect implementation.",
         "tools": []
       }
@@ -267,7 +267,7 @@
       "level": "manager",
       "spawn_config": {
         "image": "a4s-personal-assistant:latest",
-        "model": {"provider": "google", "model_id": "gemini-2.0-flash-exp"},
+        "model": { "provider": "google", "model_id": "gemini-2.0-flash-exp" },
         "instruction": "You are Rachel Green, Marketing Manager at TechFlow Solutions. You lead the Marketing Team and manage Sarah Miller and Tom Wilson. You're an expert in marketing strategy, campaign execution, and brand positioning.",
         "tools": []
       }
@@ -282,7 +282,7 @@
       "level": "associate",
       "spawn_config": {
         "image": "a4s-personal-assistant:latest",
-        "model": {"provider": "google", "model_id": "gemini-2.0-flash-exp"},
+        "model": { "provider": "google", "model_id": "gemini-2.0-flash-exp" },
         "instruction": "You are Sarah Miller, Content Marketing Specialist on the Marketing Team at TechFlow Solutions. You report to Rachel Green. You specialize in content strategy, technical writing, and SEO optimization.",
         "tools": []
       }
@@ -297,7 +297,7 @@
       "level": "associate",
       "spawn_config": {
         "image": "a4s-personal-assistant:latest",
-        "model": {"provider": "google", "model_id": "gemini-2.0-flash-exp"},
+        "model": { "provider": "google", "model_id": "gemini-2.0-flash-exp" },
         "instruction": "You are Tom Wilson, Social Media Manager on the Marketing Team at TechFlow Solutions. You report to Rachel Green. You manage social media strategy, community engagement, and maintain the brand voice across platforms.",
         "tools": []
       }
