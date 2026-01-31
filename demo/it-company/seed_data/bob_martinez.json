@@ -1,0 +1,52 @@
+{
+  "agent_id": "bob-martinez",
+  "private_memories": [
+    {
+      "name": "Learning Goals Q1 2026",
+      "episode_body": "Want to deepen knowledge of distributed tracing and observability patterns. Planning to get AWS Solutions Architect certification. Need to improve documentation writing - feedback from Alice in last review.",
+      "knowledge_type": "preference"
+    },
+    {
+      "name": "Work Schedule Preference",
+      "episode_body": "Prefer to do deep coding work early morning 7-10 AM before meetings. Reserve afternoons for code reviews, meetings, and collaboration. Usually take lunch break 12-1 PM.",
+      "knowledge_type": "pattern"
+    }
+  ],
+  "public_memories": [
+    {
+      "name": "Bob Martinez - Senior Backend Engineer",
+      "episode_body": "Bob Martinez is Senior Backend Engineer on Backend Team at TechFlow Solutions, reporting to Alice Chen. Expert in Python/FastAPI development, microservices architecture, payment gateway integrations, and distributed systems. 6 years backend engineering experience.",
+      "knowledge_type": "entity"
+    },
+    {
+      "name": "Payment Gateway Integration Experience",
+      "episode_body": "Bob has integrated multiple payment gateways including Stripe, PayPal, and Square. Deep knowledge of PCI compliance requirements, webhook handling, idempotency patterns, and payment reconciliation flows.",
+      "knowledge_type": "fact"
+    },
+    {
+      "name": "Kafka Event Schema Design",
+      "episode_body": "For payment service events, designed schemas using Avro format. Key events: PaymentInitiated, PaymentCompleted, PaymentFailed, RefundRequested. All events include correlation_id for tracing and idempotency_key for deduplication.",
+      "knowledge_type": "fact"
+    },
+    {
+      "name": "Payment Service Current Architecture",
+      "episode_body": "Payment service handles checkout, payment processing, and refunds. Uses FastAPI for REST endpoints, Celery for async tasks, PostgreSQL for transaction storage. Current deployment: 3 replicas behind load balancer, average response time 150ms, handles 500 req/sec at peak.",
+      "knowledge_type": "fact"
+    },
+    {
+      "name": "Idempotency in Payment Systems",
+      "episode_body": "Idempotency ensures that duplicate requests (due to retries or network issues) don't cause duplicate charges. Implementation uses idempotency keys stored in Redis with 24-hour TTL. If key exists, return cached response instead of processing again.",
+      "knowledge_type": "definition"
+    },
+    {
+      "name": "Payment Service Deployment Requirements",
+      "episode_body": "Service requires environment variables: DATABASE_URL, REDIS_URL, KAFKA_BROKERS, STRIPE_API_KEY (secret). Needs PostgreSQL 14+, Redis 7+, Kafka 3.0+. Runs on port 8080. Health check endpoint: /health. Requires 2GB RAM minimum per container.",
+      "knowledge_type": "fact"
+    },
+    {
+      "name": "Recent Bug Fix - Duplicate Charges",
+      "episode_body": "Fixed critical bug on January 15, 2026 where concurrent requests could cause duplicate charges. Root cause: race condition in payment processing. Solution: Added distributed lock using Redis before charging payment method. Deployed hotfix within 2 hours.",
+      "knowledge_type": "episode"
+    }
+  ]
+}

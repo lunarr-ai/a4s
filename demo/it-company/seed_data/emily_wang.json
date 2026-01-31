@@ -1,0 +1,57 @@
+{
+  "agent_id": "emily-wang",
+  "private_memories": [
+    {
+      "name": "Technical Learning Goals",
+      "episode_body": "Want to explore React Server Components and Next.js App Router for future projects. Interested in improving performance optimization skills. Planning to give tech talk on state management patterns in Q2.",
+      "knowledge_type": "preference"
+    },
+    {
+      "name": "Code Review Philosophy",
+      "episode_body": "Prefer detailed code reviews with constructive feedback. Focus on architecture decisions, performance implications, and maintainability. Usually review PRs in morning 9-11 AM. Like to pair program for complex features.",
+      "knowledge_type": "pattern"
+    }
+  ],
+  "public_memories": [
+    {
+      "name": "Emily Wang - Senior Frontend Engineer",
+      "episode_body": "Emily Wang is Senior Frontend Engineer on Frontend Team at TechFlow Solutions. Expert in React, TypeScript, state management (Redux/Zustand), frontend architecture, and performance optimization. 7 years frontend experience. Leads checkout redesign implementation. Collaborates closely with Design team.",
+      "knowledge_type": "entity"
+    },
+    {
+      "name": "Frontend Tech Stack",
+      "episode_body": "Frontend uses React 18 with TypeScript, Vite for build tooling, Zustand for state management, React Query for data fetching, React Router v6 for routing, TailwindCSS + @techflow/ui component library for styling. Testing: Vitest for unit tests, Playwright for E2E tests. All code follows ESLint and Prettier configs.",
+      "knowledge_type": "fact"
+    },
+    {
+      "name": "Checkout Redesign Implementation Plan",
+      "episode_body": "Implementation approach for new checkout: 1) Create new checkout routes (/checkout/shipping, /checkout/payment, /checkout/review), 2) Build form components with validation using react-hook-form, 3) Integrate with backend payment API, 4) Add loading states and error handling, 5) Implement analytics tracking, 6) Write E2E tests. Estimated 3 weeks for development, 1 week for testing and iteration.",
+      "knowledge_type": "fact"
+    },
+    {
+      "name": "State Management for Checkout",
+      "episode_body": "Using Zustand store for checkout state to persist data across steps. Store manages: shipping address, contact info, selected payment method, order items, applied promo codes. State persists in sessionStorage to prevent data loss on page refresh. Reset state after successful order completion.",
+      "knowledge_type": "fact"
+    },
+    {
+      "name": "Form Validation Implementation",
+      "episode_body": "Using react-hook-form for form validation with Zod schema validation. Validation rules: email format check, phone number format (US/international), required fields, credit card Luhn algorithm check, CVV 3-4 digits, expiry date not in past. Show inline errors on blur, show all errors on submit attempt.",
+      "knowledge_type": "fact"
+    },
+    {
+      "name": "Accessibility Implementation - WCAG 2.1 AA",
+      "episode_body": "Accessibility requirements implemented: semantic HTML (form, label, input), ARIA labels for screen readers, keyboard navigation (tab order, Enter to submit, Escape to close modals), focus management (focus first error field on validation fail), color contrast 4.5:1 minimum, error messages linked to fields with aria-describedby. Testing with screen reader (VoiceOver/NVDA) and keyboard-only navigation.",
+      "knowledge_type": "fact"
+    },
+    {
+      "name": "Performance Optimization Techniques",
+      "episode_body": "Performance optimizations applied: code splitting by route (lazy load checkout pages), image optimization (WebP format, lazy loading), debounce on real-time validation, memoization of expensive calculations, virtualization for long lists, bundle size monitoring. Target: First Contentful Paint <1.5s, Time to Interactive <3s.",
+      "knowledge_type": "fact"
+    },
+    {
+      "name": "React Query for Data Fetching",
+      "episode_body": "React Query is a data fetching library that manages server state, caching, and synchronization. Benefits: automatic caching, background refetching, optimistic updates, loading/error states. For checkout, using React Query to fetch: saved payment methods, shipping rates, order summary. Configured with 5-minute cache time, retry on failure 3 times.",
+      "knowledge_type": "definition"
+    }
+  ]
+}

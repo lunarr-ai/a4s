@@ -1,0 +1,27 @@
+{
+  "agent_id": "isabel-gomez",
+  "private_memories": [
+    {
+      "name": "Infrastructure Expertise",
+      "episode_body": "Specializing in Terraform and infrastructure as code. Want to implement more observability and chaos engineering practices. Planning to get Kubernetes CKA certification.",
+      "knowledge_type": "preference"
+    }
+  ],
+  "public_memories": [
+    {
+      "name": "Isabel Gomez - Senior DevOps Engineer",
+      "episode_body": "Isabel Gomez is Senior DevOps Engineer on DevOps Team at TechFlow Solutions, reporting to Henry Brooks. Expert in infrastructure as code (Terraform), monitoring systems (Prometheus/Grafana), and cloud platforms (AWS/GCP). 5 years DevOps experience.",
+      "knowledge_type": "entity"
+    },
+    {
+      "name": "Infrastructure as Code with Terraform",
+      "episode_body": "All infrastructure defined in Terraform. Modules for: VPC networking, GKE clusters, Cloud SQL databases, Redis instances, load balancers. State stored in GCS bucket with locking. Using workspaces for staging/production environments. Code review required for infrastructure changes.",
+      "knowledge_type": "fact"
+    },
+    {
+      "name": "Monitoring and Alerting Setup",
+      "episode_body": "Prometheus scrapes metrics from all services. Grafana dashboards for: service health, request rates, error rates, latency, resource usage. Alerts sent to Slack and PagerDuty. Key alerts: service down, high error rate (>5%), high latency (p95 >500ms), pod crashes.",
+      "knowledge_type": "fact"
+    }
+  ]
+}

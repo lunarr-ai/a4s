@@ -1,0 +1,52 @@
+{
+  "agent_id": "paul-anderson",
+  "private_memories": [
+    {
+      "name": "Career Development Goals",
+      "episode_body": "Want to deepen expertise in user research methods, particularly quantitative analysis. Interested in learning more about design systems strategy from Olivia. Goal: transition to Senior UX Designer role within 6 months.",
+      "knowledge_type": "preference"
+    },
+    {
+      "name": "Design Process Preference",
+      "episode_body": "Prefer to start with low-fidelity wireframes before high-fidelity mockups. Like to involve stakeholders early for feedback. Work best when doing user research analysis in morning 9-11 AM, design work in afternoon.",
+      "knowledge_type": "pattern"
+    }
+  ],
+  "public_memories": [
+    {
+      "name": "Paul Anderson - UX Designer",
+      "episode_body": "Paul Anderson is UX Designer on Design Team at TechFlow Solutions, reporting to Olivia Taylor. Specializes in user research, wireframing, interaction design, and information architecture. 5 years UX design experience. Works closely with Quinn (UI) and Frontend team.",
+      "knowledge_type": "entity"
+    },
+    {
+      "name": "Checkout Flow Wireframes",
+      "episode_body": "Created wireframes for new 3-step checkout flow. Step 1: Contact and shipping info with email, phone, address. Step 2: Payment method selection (credit card, PayPal, Apple Pay) with saved payment methods for returning users. Step 3: Order review with edit capabilities. All steps show progress indicator.",
+      "knowledge_type": "fact"
+    },
+    {
+      "name": "Progressive Disclosure Pattern",
+      "episode_body": "Progressive disclosure is a UX pattern where optional or advanced fields are hidden initially and revealed on demand. This reduces cognitive load and simplifies forms. For checkout, using this pattern to hide: gift message field, billing address (when different from shipping), promotional code input. Users click 'Add gift message' to reveal field.",
+      "knowledge_type": "definition"
+    },
+    {
+      "name": "Accessibility Requirements - WCAG 2.1",
+      "episode_body": "All new features must meet WCAG 2.1 AA compliance standards. Requirements for checkout flow: keyboard navigation support (tab order, enter to submit), screen reader compatibility (semantic HTML, ARIA labels), sufficient color contrast (minimum 4.5:1 for text), focus indicators visible, error messages programmatically associated with fields.",
+      "knowledge_type": "fact"
+    },
+    {
+      "name": "Form Validation UX Best Practices",
+      "episode_body": "Inline validation best practices: validate on blur (after user leaves field), show success indicators for valid fields, display error messages below field in red with icon, provide specific helpful error text (not just 'Invalid'), don't validate until user has attempted to fill field. For checkout, implemented real-time credit card validation with Luhn algorithm.",
+      "knowledge_type": "fact"
+    },
+    {
+      "name": "Information Architecture for Checkout",
+      "episode_body": "Information architecture defines how information is structured and organized. For checkout redesign, grouped related fields together: contact info block (email, phone), shipping address block (street, city, state, zip), payment block (card number, expiry, CVV). Clear visual hierarchy with headings and spacing.",
+      "knowledge_type": "definition"
+    },
+    {
+      "name": "User Testing Insights - Payment Selection",
+      "episode_body": "During user testing sessions January 2026, observed that users get confused when seeing 6+ payment options. Most users only look for credit card or PayPal. Recommendation: limit to 3 primary options (card, PayPal, Apple Pay) with clear logos and descriptions. This reduced decision time from 18 seconds to 6 seconds in testing.",
+      "knowledge_type": "episode"
+    }
+  ]
+}

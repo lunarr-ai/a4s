@@ -1,0 +1,32 @@
+{
+  "agent_id": "henry-brooks",
+  "private_memories": [
+    {
+      "name": "Team Leadership Goals",
+      "episode_body": "Focus on building team automation capabilities. Isabel is strong on infrastructure, James needs more mentoring on Kubernetes. Planning to standardize deployment processes across all services.",
+      "knowledge_type": "preference"
+    }
+  ],
+  "public_memories": [
+    {
+      "name": "Henry Brooks - DevOps Lead",
+      "episode_body": "Henry Brooks is DevOps Lead at TechFlow Solutions, leading the DevOps Team. Expert in Docker, Kubernetes, CI/CD automation, cloud infrastructure (AWS/GCP), and reliability engineering. 8 years DevOps experience. Manages Isabel Gomez and James Park.",
+      "knowledge_type": "entity"
+    },
+    {
+      "name": "Kubernetes Cluster Setup",
+      "episode_body": "Production cluster runs on GKE (Google Kubernetes Engine) with 3 node pools: system (cluster services), application (workloads), data (stateful services). Auto-scaling enabled, min 3 nodes per pool. Monitoring with Prometheus and Grafana. Alerts configured for high CPU, memory, pod failures.",
+      "knowledge_type": "fact"
+    },
+    {
+      "name": "CI/CD Pipeline Architecture",
+      "episode_body": "Using GitHub Actions for CI/CD. Pipeline stages: 1) Lint and format check, 2) Run tests, 3) Build Docker image, 4) Push to registry, 5) Deploy to staging, 6) Run E2E tests, 7) Deploy to production (manual approval). Deployment uses ArgoCD for GitOps workflow.",
+      "knowledge_type": "fact"
+    },
+    {
+      "name": "Payment Service Deployment Requirements",
+      "episode_body": "Payment service needs: PostgreSQL database, Redis cache, Kafka connection, secrets (Stripe API key). Kubernetes deployment: 3 replicas, resource limits 2GB RAM/1 CPU, liveness/readiness probes on /health endpoint. Uses HPA to scale 2-10 replicas based on CPU >70%.",
+      "knowledge_type": "fact"
+    }
+  ]
+}

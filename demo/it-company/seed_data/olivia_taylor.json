@@ -1,0 +1,52 @@
+{
+  "agent_id": "olivia-taylor",
+  "private_memories": [
+    {
+      "name": "Team Growth Plans",
+      "episode_body": "Paul is ready for more senior responsibilities - consider promoting to Senior UX Designer in Q2. Quinn needs more mentorship on design systems strategy. Planning to hire additional UI designer in Q2 to support growing workload.",
+      "knowledge_type": "preference"
+    },
+    {
+      "name": "Design Review Schedule",
+      "episode_body": "Team design critiques every Thursday 3-4 PM. One-on-ones with Paul on Mondays 1 PM, with Quinn on Tuesdays 10 AM. Design system working group meets bi-weekly Wednesdays 2 PM with frontend team.",
+      "knowledge_type": "pattern"
+    }
+  ],
+  "public_memories": [
+    {
+      "name": "Olivia Taylor - Design Lead",
+      "episode_body": "Olivia Taylor leads the Design Team at TechFlow Solutions, managing Paul Anderson (UX Designer) and Quinn Roberts (UI Designer). Expert in design systems, user research methodology, and design strategy. 9 years design experience, previously led design at SaaS company.",
+      "knowledge_type": "entity"
+    },
+    {
+      "name": "User Research Findings - Checkout Flow",
+      "episode_body": "User testing conducted January 2026 with 15 participants showed 73% of users struggled with payment method selection step. Key issues: too many options presented at once, unclear which cards are accepted, confusing error messages. Recommend simplifying checkout flow to maximum 3 steps with progressive disclosure pattern.",
+      "knowledge_type": "episode"
+    },
+    {
+      "name": "TechFlow Design System",
+      "episode_body": "Design system uses Figma for design files and React component library for implementation. Follows Material Design principles with custom TechFlow brand colors and spacing. Component library includes 50+ components: buttons, forms, cards, modals, navigation. Design tokens define colors, typography, spacing, shadows.",
+      "knowledge_type": "fact"
+    },
+    {
+      "name": "Checkout Redesign Approach",
+      "episode_body": "Redesigning checkout as 3-step flow: 1) Shipping information, 2) Payment method (simplified to 3 options), 3) Order review. Using progressive disclosure to hide optional fields. Added clear loading states and error handling. Designed mobile-first then adapted to desktop.",
+      "knowledge_type": "fact"
+    },
+    {
+      "name": "Design-Engineering Collaboration",
+      "episode_body": "Design team works closely with Frontend team (Emily, Frank, Grace). Process: Design creates mockups in Figma, shares with engineering for feedback, iterates based on technical constraints, hands off with design specs and Figma dev mode. Weekly sync meetings to review implementation.",
+      "knowledge_type": "fact"
+    },
+    {
+      "name": "User Research Methods",
+      "episode_body": "Team uses multiple research methods: usability testing (task-based), user interviews (open-ended), surveys (quantitative), analytics review (behavioral data). For checkout redesign, conducted 5 moderated usability tests and 10 user interviews.",
+      "knowledge_type": "fact"
+    },
+    {
+      "name": "Progressive Disclosure in UX",
+      "episode_body": "Progressive disclosure is a UX pattern that shows only essential information initially and reveals additional details on demand. Reduces cognitive load and simplifies complex interfaces. Example: hide optional form fields behind 'More options' button.",
+      "knowledge_type": "definition"
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "agent_id": "maya-singh",
+  "private_memories": [
+    {
+      "name": "Q1 Performance Metrics",
+      "episode_body": "Key metrics to track Q1 2026: Payment conversion rate (target 85%), checkout abandonment rate (reduce to <20%), customer satisfaction score (target 4.5/5). Currently tracking weekly in product analytics dashboard.",
+      "knowledge_type": "preference"
+    },
+    {
+      "name": "Stakeholder Meeting Pattern",
+      "episode_body": "Weekly sync with Alice (Backend) on Mondays 10 AM, with Olivia (Design) on Tuesdays 2 PM, with Rachel (Marketing) on Wednesdays 11 AM. Monthly business review with executives first Thursday of month.",
+      "knowledge_type": "pattern"
+    }
+  ],
+  "public_memories": [
+    {
+      "name": "Maya Singh - Product Manager",
+      "episode_body": "Maya Singh is Product Manager at TechFlow Solutions. Drives product strategy, roadmap planning, and feature prioritization for the core platform. Works closely with Engineering, Design, and Marketing teams. 5 years product management experience, previously worked at fintech startup.",
+      "knowledge_type": "entity"
+    },
+    {
+      "name": "Q1 2026 Product Priorities",
+      "episode_body": "Top priorities for Q1 2026: 1) Checkout flow optimization (reduce abandonment rate), 2) Payment service microservices migration (improve reliability), 3) Mobile app performance improvements. Checkout optimization is highest priority based on user research findings.",
+      "knowledge_type": "fact"
+    },
+    {
+      "name": "Checkout Optimization Initiative",
+      "episode_body": "Initiative launched January 2026 to redesign checkout flow. Goal: reduce abandonment from 27% to under 20%. Based on user research showing customers struggle with payment method selection. Design team (Olivia, Paul, Quinn) working on simplified 3-step flow. Target launch: February 28, 2026.",
+      "knowledge_type": "fact"
+    },
+    {
+      "name": "Product Roadmap Q1-Q2 2026",
+      "episode_body": "Q1: Checkout optimization, payment service migration, mobile performance. Q2: Guest checkout feature, saved payment methods, order tracking improvements, customer support chat integration. Q3 planning in progress.",
+      "knowledge_type": "fact"
+    },
+    {
+      "name": "Success Metrics for Checkout Redesign",
+      "episode_body": "Measuring success by: checkout abandonment rate (target <20%), time to complete checkout (target <90 seconds), payment error rate (target <2%), customer satisfaction score for checkout experience (target 4.5/5). Will A/B test new design with 20% of traffic before full rollout.",
+      "knowledge_type": "fact"
+    },
+    {
+      "name": "Customer Feedback - Payment Issues",
+      "episode_body": "User interviews in December 2025 revealed: 1) Too many payment options confusing (offer credit card, PayPal, Apple Pay only), 2) Form validation errors not clear, 3) Loading states during payment processing cause anxiety. Design team incorporating feedback into redesign.",
+      "knowledge_type": "episode"
+    },
+    {
+      "name": "A/B Testing Methodology",
+      "episode_body": "A/B testing is comparing two versions (A=control, B=variant) to measure which performs better. We use statistical significance (95% confidence) to determine winner. Minimum sample size 1000 users per variant. Typical test duration 1-2 weeks.",
+      "knowledge_type": "definition"
+    }
+  ]
+}
