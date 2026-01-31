@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:lunarr/models/agent_model.dart';
+import 'package:lunarr/models/channel_model.dart';
 import 'package:lunarr/services/agent_service.dart';
 import 'package:lunarr/services/channel_service.dart';
 import 'package:lunarr/views/agent_chat_view.dart';
@@ -18,9 +20,9 @@ class _MainViewState extends State<MainView> {
   Widget build(BuildContext context) {
     ColorScheme cs = Theme.of(context).colorScheme;
     TextTheme tt = Theme.of(context).textTheme;
-    final channelModels = ChannelService().channelModels!;
-    final agentModels = AgentService().agentModels!;
-    final channelCount = channelModels.length;
+    final List<ChannelModel> channelModels = ChannelService().channelModels!;
+    final List<AgentModel> agentModels = AgentService().agentModels!;
+    final int channelCount = channelModels.length;
 
     return Scaffold(
       body: Row(
@@ -69,7 +71,7 @@ class _MainViewState extends State<MainView> {
                     children: [
                       CircleAvatar(
                         radius: 16,
-                        child: Image.asset('assets/avatars/1.png'),
+                        child: Image.asset('assets/avatars/8.png'),
                       ),
                       Text(
                         'Seungho Jang',
@@ -110,7 +112,7 @@ class _MainViewState extends State<MainView> {
                 ...channelModels.map(
                   (channelModel) => NavigationDrawerDestination(
                     icon: channelModel.getIcon(12),
-                    label: channelModel.label,
+                    label: Text(channelModel.labelString),
                   ),
                 ),
                 SizedBox(
@@ -137,7 +139,7 @@ class _MainViewState extends State<MainView> {
                 ...agentModels.map(
                   (agentModel) => NavigationDrawerDestination(
                     icon: agentModel.getIcon(12),
-                    label: agentModel.label,
+                    label: Text(agentModel.labelString),
                   ),
                 ),
               ],

@@ -15,12 +15,13 @@ class ChannelService {
 
   Future<void> fetchChannelModels() async {
     _channelModels = [
-      ChannelModel('', 'All'),
-      ChannelModel('', 'Frontend Team'),
-      ChannelModel('', 'Backend Team'),
-      ChannelModel('', 'Developers'),
-      ChannelModel('', 'Lunch Group'),
-    ];
+      'All',
+      'Frontend Team',
+      'Backend Team',
+      'Developers',
+      'Lunch Group',
+    ].map((labelString) => ChannelModel('', labelString, 10, 10)).toList();
+
     fetchChannelModel(0);
   }
 

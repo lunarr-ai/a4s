@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
 
 class ChannelModel {
-  ChannelModel(this.iconString, this.labelString);
+  ChannelModel(
+    this.iconString,
+    this.labelString,
+    this.agentsCount,
+    this.usersCount,
+  );
 
-  String iconString;
-  String labelString;
+  final String iconString;
+  final String labelString;
+  final int agentsCount;
+  final int usersCount;
 
   // Widget get icon => CircleAvatar(child: Image.network(iconString));
   Widget getIcon(double radius) => CircleAvatar(
@@ -12,5 +19,4 @@ class ChannelModel {
     backgroundColor: Colors.transparent,
     child: Text('#'),
   );
-  Widget get label => Text(labelString);
 }

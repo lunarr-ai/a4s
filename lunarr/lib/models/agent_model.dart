@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 class AgentModel {
   AgentModel(this.iconString, this.labelString);
 
-  String iconString;
-  String labelString;
+  final String iconString;
+  final String labelString;
 
   // Widget getIcon(double radius) =>
   //     CircleAvatar(radius: radius, child: Image.network(iconString));
@@ -12,5 +12,4 @@ class AgentModel {
     radius: radius,
     child: Image.asset('assets/avatars/$iconString.png'),
   );
-  Widget get label => Text(labelString);
 }
