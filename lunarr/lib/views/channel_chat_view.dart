@@ -17,6 +17,10 @@ class _ChannelChatViewState extends State<ChannelChatView> {
     TextTheme tt = Theme.of(context).textTheme;
     final ChannelModel channelModel = ChannelService().channelModel!;
 
-    return Column(children: [ChannelChatAppBarWidget()]);
+    return Stack(
+      children: [
+        Column(children: [ChannelChatAppBarWidget()]),
+      ],
+    );
   }
 }

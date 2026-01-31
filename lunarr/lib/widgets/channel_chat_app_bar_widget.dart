@@ -33,11 +33,6 @@ class ChannelChatAppBarWidget extends StatelessWidget {
                 onPressed: () {},
                 label: Text('${channelModel.agentsCount}'),
               ),
-              TextButton.icon(
-                icon: Icon(Icons.person),
-                onPressed: () {},
-                label: Text('${channelModel.usersCount}'),
-              ),
               IconButton(onPressed: () {}, icon: Icon(Icons.more_vert)),
             ],
           ),

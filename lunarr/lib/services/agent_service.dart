@@ -1,4 +1,6 @@
 import 'package:lunarr/models/agent_model.dart';
+import 'package:lunarr/services/user_service.dart';
+import 'package:lunarr/services/workspace_service.dart';
 
 class AgentService {
   AgentService._internal();
@@ -13,7 +15,11 @@ class AgentService {
   List<AgentModel>? get agentModels => _agentModels;
   AgentModel? get agentModel => _agentModel;
 
+  // TODO: fetch agent models from user service and workspace service
   Future<void> fetchAgentModels() async {
+    UserService userService = UserService();
+    WorkspaceService workspaceService = WorkspaceService();
+
     _agentModels = [
       AgentModel('1', 'Seungho\'s Agent'),
       AgentModel('2', 'Kyungho\'s Agent'),
