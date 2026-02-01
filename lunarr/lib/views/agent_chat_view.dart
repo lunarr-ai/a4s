@@ -49,6 +49,7 @@ class _AgentChatViewState extends State<AgentChatView> {
             return Center(child: CircularProgressIndicator());
           }
           return SingleChildScrollView(
+            controller: acc.scrollController,
             padding: const EdgeInsets.only(bottom: 200),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,

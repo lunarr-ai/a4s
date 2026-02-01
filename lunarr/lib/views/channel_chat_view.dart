@@ -49,6 +49,7 @@ class _ChannelChatViewState extends State<ChannelChatView> {
             return Center(child: CircularProgressIndicator());
           }
           return SingleChildScrollView(
+            controller: ccc.scrollController,
             padding: const EdgeInsets.only(bottom: 200),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
