@@ -290,7 +290,10 @@ class _ChannelChatViewState extends State<ChannelChatView> {
                     ),
                     Text(
                       'Show Thinking',
-                      style: tt.labelLarge?.copyWith(color: cs.onSurface),
+                      style: tt.labelLarge?.copyWith(
+                        color: cs.onSurface,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     IconButton(
                       onPressed: () {},
@@ -309,26 +312,52 @@ class _ChannelChatViewState extends State<ChannelChatView> {
   Widget _buildAnswers(List<AnswerModel> ams, ColorScheme cs, TextTheme tt) {
     final ChannelModel cm = ChannelService().channelModel;
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Container(
-          constraints: BoxConstraints(maxWidth: 720),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                constraints: BoxConstraints(maxWidth: 480),
-                padding: EdgeInsets.symmetric(horizontal: 24),
-                child: Text(
-                  ams.first.body,
-                  style: tt.bodyLarge?.copyWith(color: cs.onSurface),
-                ),
+    return Column(
+      spacing: 24,
+      children: ams.map((am) {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              constraints: BoxConstraints(maxWidth: 720),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    constraints: BoxConstraints(maxWidth: 480),
+                    padding: EdgeInsets.symmetric(horizontal: 24),
+                    child: Column(
+                      spacing: 12,
+                      children: [
+                        Row(
+                          spacing: 12,
+                          children: [
+                            CircleAvatar(
+                              radius: 12,
+                              child: Image.asset(am.agentCardModel.iconString),
+                            ),
+                            Text(
+                              am.agentCardModel.name,
+                              style: tt.labelLarge?.copyWith(
+                                color: cs.onSurface,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Text(
+                          am.body,
+                          style: tt.bodyLarge?.copyWith(color: cs.onSurface),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
-      ],
+            ),
+          ],
+        );
+      }).toList(),
     );
   }
 

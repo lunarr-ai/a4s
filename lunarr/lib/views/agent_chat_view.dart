@@ -284,7 +284,10 @@ class _AgentChatViewState extends State<AgentChatView> {
                     ),
                     Text(
                       'Show Thinking',
-                      style: tt.labelLarge?.copyWith(color: cs.onSurface),
+                      style: tt.labelLarge?.copyWith(
+                        color: cs.onSurface,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     IconButton(
                       onPressed: () {},
