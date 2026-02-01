@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:lunarr/models/agent_card_model.dart';
 import 'package:lunarr/models/channel_chat_model.dart';
 
 class ChannelChatController {
@@ -30,10 +31,12 @@ class ChannelChatController {
   Future<void> fetchChannelChatModels() async {
     await Future.delayed(const Duration(seconds: 1));
     List<ChannelChatModel> channelChatModels = [
-      ...ChannelChatModel.examples(),
-      ...ChannelChatModel.examples(),
-      ...ChannelChatModel.examples(),
-      ...ChannelChatModel.examples(),
+      for (int i = 0; i < 4; i++)
+        ...ChannelChatModel.examples([
+          AgentCardModel.kyungho(false),
+          AgentCardModel.minseok(false),
+          AgentCardModel.seungho(false),
+        ]),
     ];
 
     _channelChatModels.addAll(channelChatModels);
@@ -48,7 +51,7 @@ class ChannelChatController {
     input = '';
     _textEditingController.clear();
 
-    _channelChatModels.add(ChannelChatModel.question(_input));
+    _channelChatModels.add(ChannelChatModel.question((body: _input)));
     scroll();
   }
 
@@ -62,9 +65,17 @@ class ChannelChatController {
   }
 
   // TODO: integrate API (not for now)
-  Future<void> addThinking() async {
+  Future<void> addThinkings() async {
+    List<AgentCardModel> agentCardModels = [
+      AgentCardModel.kyungho(false),
+      AgentCardModel.minseok(false),
+      AgentCardModel.seungho(false),
+    ];
+
     await Future.delayed(const Duration(seconds: 1));
-    ChannelChatModel thinking = ChannelChatModel.thinkingExample();
+    ChannelChatModel thinking = ChannelChatModel.thinkingsExample(
+      agentCardModels,
+    );
 
     _channelChatModels.add(thinking);
     scroll();
@@ -72,8 +83,14 @@ class ChannelChatController {
 
   // TODO: integrate API
   Future<void> addAnswer() async {
+    List<AgentCardModel> agentCardModels = [
+      AgentCardModel.kyungho(false),
+      AgentCardModel.minseok(false),
+      AgentCardModel.seungho(false),
+    ];
+
     await Future.delayed(const Duration(seconds: 1));
-    ChannelChatModel answer = ChannelChatModel.answerExample();
+    ChannelChatModel answer = ChannelChatModel.answersExample(agentCardModels);
 
     _channelChatModels.add(answer);
     scroll();

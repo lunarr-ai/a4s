@@ -3,6 +3,7 @@ import 'package:lunarr/controllers/agent_chat_controller.dart';
 import 'package:lunarr/models/agent_card_model.dart';
 import 'package:lunarr/models/agent_chat_model.dart';
 import 'package:lunarr/models/agent_model.dart';
+import 'package:lunarr/models/chat_model.dart';
 import 'package:lunarr/services/agent_service.dart';
 import 'package:lunarr/widgets/agent_card_widget.dart';
 
@@ -56,18 +57,18 @@ class _AgentChatViewState extends State<AgentChatView> {
                 ...acc.agentChatModels.map((acms) {
                   switch (acms.type) {
                     case AgentChatType.question:
-                      return _buildQuestion(acms, cs, tt);
+                      return _buildQuestion(acms.questionModel!, cs, tt);
                     case AgentChatType.selection:
                       return _buildSelection(
-                        acms.selectionBody!,
+                        acms.selectionModel!,
                         cs,
                         tt,
                         acc.lock && acms == acc.agentChatModels.last,
                       );
                     case AgentChatType.thinking:
-                      return _buildThinking(cs, tt);
+                      return _buildThinking(acms.thinkingModel!, cs, tt);
                     case AgentChatType.answer:
-                      return _buildAnswer(acms, cs, tt);
+                      return _buildAnswer(acms.answerModel!, cs, tt);
                   }
                 }),
               ],
@@ -78,7 +79,7 @@ class _AgentChatViewState extends State<AgentChatView> {
     );
   }
 
-  Widget _buildQuestion(AgentChatModel model, ColorScheme cs, TextTheme tt) {
+  Widget _buildQuestion(QuestionModel qm, ColorScheme cs, TextTheme tt) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -99,7 +100,7 @@ class _AgentChatViewState extends State<AgentChatView> {
                   ),
                 ),
                 child: Text(
-                  model.questionBody ?? '',
+                  qm.body,
                   style: tt.bodyLarge?.copyWith(color: cs.onSurface),
                 ),
               ),
@@ -111,11 +112,13 @@ class _AgentChatViewState extends State<AgentChatView> {
   }
 
   Widget _buildSelection(
-    List<AgentCardModel> acms,
+    SelectionModel sm,
     ColorScheme cs,
     TextTheme tt,
     bool enabled,
   ) {
+    List<AgentCardModel> acms = sm.body;
+
     if (enabled) {
       final ValueNotifier<int> areSelectedCount = ValueNotifier<int>(0);
 
@@ -260,7 +263,7 @@ class _AgentChatViewState extends State<AgentChatView> {
     }
   }
 
-  Widget _buildThinking(ColorScheme cs, TextTheme tt) {
+  Widget _buildThinking(ThinkingModel tm, ColorScheme cs, TextTheme tt) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -297,9 +300,7 @@ class _AgentChatViewState extends State<AgentChatView> {
     );
   }
 
-  Widget _buildAnswer(AgentChatModel model, ColorScheme cs, TextTheme tt) {
-    final AgentModel am = AgentService().agentModel;
-
+  Widget _buildAnswer(AnswerModel am, ColorScheme cs, TextTheme tt) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -310,9 +311,9 @@ class _AgentChatViewState extends State<AgentChatView> {
             children: [
               Container(
                 constraints: BoxConstraints(maxWidth: 480),
-                padding: EdgeInsets.all(24),
+                padding: EdgeInsets.symmetric(horizontal: 24),
                 child: Text(
-                  model.questionBody ?? '',
+                  am.body,
                   style: tt.bodyLarge?.copyWith(color: cs.onSurface),
                 ),
               ),

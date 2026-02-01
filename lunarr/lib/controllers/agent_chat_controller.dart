@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:lunarr/models/agent_card_model.dart';
 import 'package:lunarr/models/agent_chat_model.dart';
 
 class AgentChatController {
@@ -28,12 +29,11 @@ class AgentChatController {
 
   // TODO: integrate API (not for now)
   Future<void> fetchAgentChatModels() async {
+    AgentCardModel agentCardModel = AgentCardModel.seungho(false);
+
     await Future.delayed(const Duration(seconds: 1));
     List<AgentChatModel> agentChatModels = [
-      ...AgentChatModel.examples(),
-      ...AgentChatModel.examples(),
-      ...AgentChatModel.examples(),
-      ...AgentChatModel.examples(),
+      for (int i = 0; i < 4; i++) ...AgentChatModel.examples(agentCardModel),
     ];
 
     _agentChatModels.addAll(agentChatModels);
@@ -48,7 +48,7 @@ class AgentChatController {
     input = '';
     _textEditingController.clear();
 
-    _agentChatModels.add(AgentChatModel.question(_input));
+    _agentChatModels.add(AgentChatModel.question((body: _input)));
     scroll();
   }
 
@@ -63,8 +63,10 @@ class AgentChatController {
 
   // TODO: integrate API (not for now)
   Future<void> addThinking() async {
+    AgentCardModel agentCardModel = AgentCardModel.seungho(false);
+
     await Future.delayed(const Duration(seconds: 1));
-    AgentChatModel thinking = AgentChatModel.thinkingExample();
+    AgentChatModel thinking = AgentChatModel.thinkingExample(agentCardModel);
 
     _agentChatModels.add(thinking);
     scroll();
@@ -72,8 +74,10 @@ class AgentChatController {
 
   // TODO: integrate API
   Future<void> addAnswer() async {
+    AgentCardModel agentCardModel = AgentCardModel.seungho(false);
+
     await Future.delayed(const Duration(seconds: 1));
-    AgentChatModel answer = AgentChatModel.answerExample();
+    AgentChatModel answer = AgentChatModel.answerExample(agentCardModel);
 
     _agentChatModels.add(answer);
     scroll();

@@ -3,6 +3,7 @@ import 'package:lunarr/controllers/channel_chat_controller.dart';
 import 'package:lunarr/models/agent_card_model.dart';
 import 'package:lunarr/models/channel_chat_model.dart';
 import 'package:lunarr/models/channel_model.dart';
+import 'package:lunarr/models/chat_model.dart';
 import 'package:lunarr/services/channel_service.dart';
 import 'package:lunarr/widgets/agent_card_widget.dart';
 
@@ -56,18 +57,18 @@ class _ChannelChatViewState extends State<ChannelChatView> {
                 ...ccc.channelChatModels.map((ccms) {
                   switch (ccms.type) {
                     case ChannelChatType.question:
-                      return _buildQuestion(ccms, cs, tt);
+                      return _buildQuestion(ccms.questionModel!, cs, tt);
                     case ChannelChatType.selection:
                       return _buildSelection(
-                        ccms.selectionBody!,
+                        ccms.selectionModel!,
                         cs,
                         tt,
                         ccc.lock && ccms == ccc.channelChatModels.last,
                       );
-                    case ChannelChatType.thinking:
-                      return _buildThinking(cs, tt);
-                    case ChannelChatType.answer:
-                      return _buildAnswer(ccms, cs, tt);
+                    case ChannelChatType.thinkings:
+                      return _buildThinkings(ccms.thinkingModels!, cs, tt);
+                    case ChannelChatType.answers:
+                      return _buildAnswers(ccms.answerModels!, cs, tt);
                   }
                 }),
               ],
@@ -78,7 +79,7 @@ class _ChannelChatViewState extends State<ChannelChatView> {
     );
   }
 
-  Widget _buildQuestion(ChannelChatModel model, ColorScheme cs, TextTheme tt) {
+  Widget _buildQuestion(QuestionModel qm, ColorScheme cs, TextTheme tt) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -99,7 +100,7 @@ class _ChannelChatViewState extends State<ChannelChatView> {
                   ),
                 ),
                 child: Text(
-                  model.questionBody ?? '',
+                  qm.body,
                   style: tt.bodyLarge?.copyWith(color: cs.onSurface),
                 ),
               ),
@@ -111,11 +112,13 @@ class _ChannelChatViewState extends State<ChannelChatView> {
   }
 
   Widget _buildSelection(
-    List<AgentCardModel> acms,
+    SelectionModel sm,
     ColorScheme cs,
     TextTheme tt,
     bool enabled,
   ) {
+    List<AgentCardModel> acms = sm.body;
+
     if (enabled) {
       final ValueNotifier<int> areSelectedCount = ValueNotifier<int>(0);
 
@@ -167,7 +170,7 @@ class _ChannelChatViewState extends State<ChannelChatView> {
                               deleteAreSelectedCount();
                               deleteIsConfirmed();
 
-                              await ccc.addThinking();
+                              await ccc.addThinkings();
                               setState(() {});
 
                               await ccc.addAnswer();
@@ -260,7 +263,11 @@ class _ChannelChatViewState extends State<ChannelChatView> {
     }
   }
 
-  Widget _buildThinking(ColorScheme cs, TextTheme tt) {
+  Widget _buildThinkings(
+    List<ThinkingModel> tms,
+    ColorScheme cs,
+    TextTheme tt,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -275,7 +282,12 @@ class _ChannelChatViewState extends State<ChannelChatView> {
                 child: Row(
                   spacing: 12,
                   children: [
-                    CircleAvatar(radius: 12),
+                    ...tms.map(
+                      (tm) => CircleAvatar(
+                        radius: 12,
+                        child: Image.asset(tm.agentCardModel.iconString),
+                      ),
+                    ),
                     Text(
                       'Show Thinking',
                       style: tt.labelLarge?.copyWith(color: cs.onSurface),
@@ -294,7 +306,7 @@ class _ChannelChatViewState extends State<ChannelChatView> {
     );
   }
 
-  Widget _buildAnswer(ChannelChatModel model, ColorScheme cs, TextTheme tt) {
+  Widget _buildAnswers(List<AnswerModel> ams, ColorScheme cs, TextTheme tt) {
     final ChannelModel cm = ChannelService().channelModel;
 
     return Row(
@@ -307,9 +319,9 @@ class _ChannelChatViewState extends State<ChannelChatView> {
             children: [
               Container(
                 constraints: BoxConstraints(maxWidth: 480),
-                padding: EdgeInsets.all(24),
+                padding: EdgeInsets.symmetric(horizontal: 24),
                 child: Text(
-                  model.answerBody ?? '',
+                  ams.first.body,
                   style: tt.bodyLarge?.copyWith(color: cs.onSurface),
                 ),
               ),
