@@ -30,9 +30,12 @@ services:
       - QDRANT_URL=http://a4s-registry:6333
       - GRAPHITI_FALKORDB_HOST=a4s-memory
       - 'CORS_ORIGINS=["http://localhost:3000", "http://localhost:5173", "http://localhost:8081"]'
+      - SKILLS_DB_PATH=/app/data/skills.db
+      - CHANNEL_DB_PATH=/app/data/channels.db
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - model-cache:/root/.cache
+      - api-data:/app/data
     depends_on:
       - a4s-registry
       - a4s-memory
@@ -68,3 +71,5 @@ volumes:
   falkordb-data:
   # Model cache for fastembed
   model-cache:
+  # SQLite data for skills and channels
+  api-data:

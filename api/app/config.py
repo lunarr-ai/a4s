@@ -44,6 +44,9 @@ class Config(BaseSettings):
     # Skills registry
     skills_db_path: str = "skills.db"
 
+    # Channels registry
+    channel_db_path: str = "channels.db"
+
     # Memory - LLM
     memory_llm_provider: LLMProvider = LLMProvider.OPENAI
     memory_llm_model: str = "gpt-4o-mini"
