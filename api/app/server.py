@@ -95,7 +95,6 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     runtime_manager = DockerRuntimeManager(
         api_base_url=config.api_base_url,
         network_name=config.agent_network,
-        agent_gateway_url=config.agent_gateway_url,
     )
     skills_registry = await SqliteSkillsRegistry.create(config.skills_db_path)
     memory_manager = await create_memory_manager(config)

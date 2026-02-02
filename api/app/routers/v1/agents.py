@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING, Annotated
 
-from fastapi import APIRouter, Query, Request
+import httpx
+from fastapi import APIRouter, HTTPException, Query, Request
 from fastapi.responses import Response
 from pydantic import BaseModel, Field
 
@@ -12,6 +13,9 @@ if TYPE_CHECKING:
     from app.broker.registry import AgentRegistry
     from app.runtime.agent_scheduler import AgentScheduler
     from app.runtime.manager import RuntimeManager
+
+PROXY_TIMEOUT = httpx.Timeout(timeout=300.0, connect=30.0)
+EXCLUDED_HEADERS = frozenset({"host", "content-length", "transfer-encoding", "content-encoding"})
 
 router = APIRouter(prefix="/agents", tags=["agents"])
 
@@ -241,11 +245,12 @@ async def get_agent_status(request: Request, agent_id: str) -> AgentStatusRespon
     return AgentStatusResponse(agent_id=agent_id, status=status)
 
 
-@router.post("/{agent_id}/ensure-running")
+@router.api_route("/{agent_id}/ensure-running", methods=["GET", "POST"])
 async def ensure_running(request: Request, agent_id: str) -> Response:
     """Ensure agent is running (for nginx auth_request).
 
     Triggers cold start if needed, records activity.
+    Accepts both GET (for nginx auth_request) and POST.
 
     Args:
         request: FastAPI request object.
@@ -264,3 +269,55 @@ async def ensure_running(request: Request, agent_id: str) -> Response:
         scheduler.record_activity(agent_id)
 
     return Response(status_code=200)
+
+
+@router.api_route("/{agent_id}/proxy/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"])
+async def proxy_to_agent(request: Request, agent_id: str, path: str = "") -> Response:
+    """Proxy request to agent container with cold start.
+
+    Args:
+        request: FastAPI request object.
+        agent_id: ID of the agent to proxy to.
+        path: Path to forward to the agent.
+
+    Returns:
+        Proxied response from the agent.
+    """
+    if request.method == "OPTIONS":
+        return Response(
+            status_code=204,
+            headers={
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type, Authorization",
+                "Access-Control-Max-Age": "1728000",
+            },
+        )
+
+    scheduler: AgentScheduler = request.app.state.agent_scheduler
+    registry: AgentRegistry = request.app.state.registry
+
+    agent = await registry.get_agent(agent_id)
+    if agent.mode == AgentMode.SERVERLESS:
+        await scheduler.ensure_running(agent_id)
+        scheduler.record_activity(agent_id)
+
+    target_url = f"{agent.url}/{path}"
+    if request.query_params:
+        target_url = f"{target_url}?{request.query_params}"
+
+    headers = {k: v for k, v in request.headers.items() if k.lower() not in EXCLUDED_HEADERS}
+    body = await request.body()
+
+    async with httpx.AsyncClient(timeout=PROXY_TIMEOUT) as client:
+        try:
+            resp = await client.request(method=request.method, url=target_url, headers=headers, content=body)
+        except httpx.TimeoutException as e:
+            raise HTTPException(status_code=504, detail="Agent request timed out") from e
+        except httpx.ConnectError as e:
+            raise HTTPException(status_code=502, detail="Failed to connect to agent") from e
+
+    resp_headers = {k: v for k, v in resp.headers.items() if k.lower() not in EXCLUDED_HEADERS}
+    resp_headers["Access-Control-Allow-Origin"] = "*"
+
+    return Response(content=resp.content, status_code=resp.status_code, headers=resp_headers)
