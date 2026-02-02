@@ -1,6 +1,13 @@
+import 'dart:convert';
+import 'dart:developer';
+
+import 'package:http/http.dart' as http;
 import 'package:lunarr/models/channel_model.dart';
-import 'package:lunarr/services/user_service.dart';
-import 'package:lunarr/services/workspace_service.dart';
+
+const _baseUrl = String.fromEnvironment(
+  'API_BASE_URL',
+  defaultValue: 'http://localhost:8000',
+);
 
 class ChannelService {
   ChannelService._internal();
@@ -13,13 +20,34 @@ class ChannelService {
   ChannelModel? _channelModel;
 
   List<ChannelModel>? get channelModels => _channelModels;
-  ChannelModel get channelModel => _channelModel ?? ChannelModel('', '', 0);
+  ChannelModel get channelModel =>
+      _channelModel ??
+      ChannelModel(id: '', name: '', description: '', ownerId: '');
 
-  // TODO: fetch channel models from user service and workspace service
   Future<void> fetchChannelModels() async {
-    UserService userService = UserService();
-    WorkspaceService workspaceService = WorkspaceService();
+    try {
+      final uri = Uri.parse('$_baseUrl/api/v1/channels');
+      final response = await http.get(uri);
 
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        final listResponse = ChannelListResponse.fromJson(data);
+        _channelModels = listResponse.channels;
+
+        if (_channelModels!.isNotEmpty) {
+          fetchChannelModel(0);
+        }
+        return;
+      }
+      log('Failed to fetch channels: ${response.statusCode}');
+    } catch (e) {
+      log('Error fetching channels: $e');
+    }
+
+    _useMockData();
+  }
+
+  void _useMockData() {
     _channelModels = [
       ChannelModel.all(),
       ChannelModel.frontendTeam(),
@@ -27,11 +55,60 @@ class ChannelService {
       ChannelModel.developers(),
       ChannelModel.lunchGroup(),
     ];
-
     fetchChannelModel(0);
   }
 
   void fetchChannelModel(int index) {
-    _channelModel = _channelModels![index];
+    if (_channelModels != null && index < _channelModels!.length) {
+      _channelModel = _channelModels![index];
+    }
+  }
+
+  Future<List<AgentSummary>> searchRelevantAgents(
+      String channelId, String query) async {
+    try {
+      final uri = Uri.parse(
+          '$_baseUrl/api/v1/channels/$channelId/agents/search?query=${Uri.encodeComponent(query)}');
+      final response = await http.get(uri);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        final searchResponse = ChannelAgentSearchResponse.fromJson(data);
+        return searchResponse.agents;
+      }
+      log('Failed to search agents: ${response.statusCode}');
+    } catch (e) {
+      log('Error searching agents: $e');
+    }
+    return [];
+  }
+
+  Future<ChannelChatResponse?> sendChannelMessage(
+    String channelId,
+    String message,
+    List<String> agentIds,
+  ) async {
+    try {
+      final uri = Uri.parse('$_baseUrl/api/v1/channels/$channelId/chat');
+      final body = jsonEncode({
+        'message': message,
+        'agent_ids': agentIds,
+      });
+
+      final response = await http.post(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: body,
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        return ChannelChatResponse.fromJson(data);
+      }
+      log('Failed to send channel message: ${response.statusCode}');
+    } catch (e) {
+      log('Error sending channel message: $e');
+    }
+    return null;
   }
 }

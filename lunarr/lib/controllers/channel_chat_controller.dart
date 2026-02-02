@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:lunarr/models/agent_card_model.dart';
 import 'package:lunarr/models/channel_chat_model.dart';
+import 'package:lunarr/models/channel_model.dart';
+import 'package:lunarr/services/channel_service.dart';
 
 class ChannelChatController {
   bool _lock = false;
@@ -11,6 +13,7 @@ class ChannelChatController {
   final ScrollController _scrollController = ScrollController();
   String input = '';
   String _input = '';
+  List<String> _selectedAgentIds = [];
 
   bool get lock => _lock;
   List<ChannelChatModel> get channelChatModels => _channelChatModels;
@@ -27,7 +30,6 @@ class ChannelChatController {
     });
   }
 
-  // TODO: integrate API (not for now)
   Future<void> fetchChannelChatModels() async {
     await Future.delayed(const Duration(seconds: 1));
     List<ChannelChatModel> channelChatModels = [
@@ -55,16 +57,42 @@ class ChannelChatController {
     scroll();
   }
 
-  // TODO: integrate API
   Future<void> addSelection() async {
-    await Future.delayed(const Duration(seconds: 1));
-    ChannelChatModel selection = ChannelChatModel.selectionExample();
+    final channelService = ChannelService();
+    final channel = channelService.channelModel;
 
-    _channelChatModels.add(selection);
+    List<AgentSummary> relevantAgents = [];
+
+    if (channel.id.isNotEmpty) {
+      relevantAgents =
+          await channelService.searchRelevantAgents(channel.id, _input);
+    }
+
+    if (relevantAgents.isEmpty) {
+      ChannelChatModel selection = ChannelChatModel.selectionExample();
+      _channelChatModels.add(selection);
+    } else {
+      final agentCards = relevantAgents
+          .map((a) => AgentCardModel(
+                id: a.id,
+                iconString: 'assets/avatars/1.png',
+                name: a.name,
+                distributionList: '',
+                description: a.description,
+                instruction: '',
+                model: '',
+                tools: [],
+                knowledges: [],
+                isSelected: true,
+              ))
+          .toList();
+
+      _channelChatModels.add(ChannelChatModel.selection((body: agentCards)));
+    }
+
     scroll();
   }
 
-  // TODO: integrate API (not for now)
   Future<void> addThinkings() async {
     List<AgentCardModel> agentCardModels = [
       AgentCardModel.kyungho(false),
@@ -81,8 +109,54 @@ class ChannelChatController {
     scroll();
   }
 
-  // TODO: integrate API
+  void setSelectedAgentIds(List<String> agentIds) {
+    _selectedAgentIds = agentIds;
+  }
+
   Future<void> addAnswer() async {
+    final channelService = ChannelService();
+    final channel = channelService.channelModel;
+
+    if (channel.id.isNotEmpty && _selectedAgentIds.isNotEmpty) {
+      final chatResponse = await channelService.sendChannelMessage(
+        channel.id,
+        _input,
+        _selectedAgentIds,
+      );
+
+      if (chatResponse != null && chatResponse.results.isNotEmpty) {
+        final agentCards = chatResponse.results
+            .map((r) => AgentCardModel(
+                  id: r.agentId,
+                  iconString: 'assets/avatars/1.png',
+                  name: r.agentName,
+                  distributionList: '',
+                  description: '',
+                  instruction: '',
+                  model: '',
+                  tools: [],
+                  knowledges: [],
+                  isSelected: false,
+                ))
+            .toList();
+
+        final answerModels = chatResponse.results
+            .asMap()
+            .entries
+            .map((entry) => (
+                  agentCardModel: agentCards[entry.key],
+                  body: entry.value.response ?? entry.value.error ?? 'No response',
+                ))
+            .toList();
+
+        _channelChatModels.add(ChannelChatModel.answers(answerModels));
+        scroll();
+        _lock = false;
+        _selectedAgentIds = [];
+        return;
+      }
+    }
+
     List<AgentCardModel> agentCardModels = [
       AgentCardModel.kyungho(false),
       AgentCardModel.minseok(false),
@@ -96,5 +170,6 @@ class ChannelChatController {
     scroll();
 
     _lock = false;
+    _selectedAgentIds = [];
   }
 }
