@@ -75,3 +75,15 @@ class Agent(BaseModel):
     created_at: datetime = Field(description="The timestamp of the agent creation.", default_factory=datetime.now)
     mode: AgentMode = Field(default=AgentMode.SERVERLESS, description="Runtime mode of the agent.")
     spawn_config: SpawnConfig | None = Field(default=None, description="Configuration for spawning agent containers.")
+
+
+class Channel(BaseModel):
+    """Metadata for a channel containing agents."""
+
+    id: str = Field(description="The unique identifier of the channel.")
+    name: str = Field(description="The name of the channel.")
+    description: str = Field(description="The description of the channel's purpose.")
+    agent_ids: list[str] = Field(default_factory=list, description="List of agent IDs in this channel.")
+    owner_id: str = Field(description="The ID of the channel's owner.")
+    created_at: datetime = Field(description="Timestamp of creation.", default_factory=datetime.now)
+    updated_at: datetime = Field(description="Timestamp of last update.", default_factory=datetime.now)

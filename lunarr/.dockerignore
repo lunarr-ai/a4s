@@ -1,0 +1,11 @@
+.dart_tool/
+.idea/
+.vscode/
+build/
+.packages
+.pub-cache/
+.pub/
+*.iml
+*.log
+.DS_Store
+.firebase/

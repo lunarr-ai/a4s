@@ -1,4 +1,7 @@
+import 'package:lunarr/models/agent.dart';
+
 class AgentCardModel {
+  final String id;
   final String iconString;
   final String name;
   final String distributionList;
@@ -10,6 +13,7 @@ class AgentCardModel {
   bool isSelected;
 
   AgentCardModel({
+    this.id = '',
     required this.iconString,
     required this.name,
     required this.distributionList,
@@ -20,6 +24,25 @@ class AgentCardModel {
     required this.knowledges,
     required this.isSelected,
   });
+
+  factory AgentCardModel.fromAgent(
+    Agent agent, {
+    bool isSelected = false,
+    int avatarIndex = 1,
+  }) {
+    return AgentCardModel(
+      id: agent.id,
+      iconString: 'assets/avatars/$avatarIndex.png',
+      name: agent.name,
+      distributionList: agent.ownerId,
+      description: agent.description,
+      instruction: agent.spawnConfig?.instruction ?? '',
+      model: agent.spawnConfig?.model.displayName ?? 'Unknown',
+      tools: agent.spawnConfig?.tools ?? [],
+      knowledges: [],
+      isSelected: isSelected,
+    );
+  }
 
   static AgentCardModel seungho(bool isSelected) {
     return AgentCardModel(

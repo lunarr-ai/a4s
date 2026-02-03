@@ -33,7 +33,6 @@ class Config(BaseSettings):
     # Agent runtime
     agent_idle_timeout: int = Field(default=300, description="Idle timeout in seconds")
     agent_reaper_interval: int = Field(default=30, description="Reaper check interval")
-    agent_gateway_url: str = Field(default="http://localhost:8080", description="Gateway URL for agent routing")
 
     # Qdrant
     qdrant_url: str = "http://localhost:6333"
@@ -44,6 +43,9 @@ class Config(BaseSettings):
 
     # Skills registry
     skills_db_path: str = "skills.db"
+
+    # Channels registry
+    channel_db_path: str = "channels.db"
 
     # Memory - LLM
     memory_llm_provider: LLMProvider = LLMProvider.OPENAI

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:lunarr/models/agent_card_model.dart';
 import 'package:lunarr/models/agent_chat_model.dart';
+import 'package:lunarr/services/agent_service.dart';
 
 class AgentChatController {
   bool _lock = false;
@@ -11,6 +12,7 @@ class AgentChatController {
   final ScrollController _scrollController = ScrollController();
   String input = '';
   String _input = '';
+  String? _selectedAgentId;
 
   bool get lock => _lock;
   List<AgentChatModel> get agentChatModels => _agentChatModels;
@@ -52,12 +54,31 @@ class AgentChatController {
     scroll();
   }
 
-  // TODO: integrate API
   Future<void> addSelection() async {
-    await Future.delayed(const Duration(seconds: 1));
-    AgentChatModel selection = AgentChatModel.selectionExample();
+    final agentService = AgentService();
+    final agents = agentService.agents;
 
-    _agentChatModels.add(selection);
+    List<AgentCardModel> agentCards;
+    if (agents.isNotEmpty) {
+      agentCards = agents
+          .asMap()
+          .entries
+          .map((e) => AgentCardModel.fromAgent(
+                e.value,
+                isSelected: e.key == 0,
+                avatarIndex: (e.key % 30) + 1,
+              ))
+          .toList();
+      _selectedAgentId = agents.first.id;
+    } else {
+      agentCards = [
+        AgentCardModel.seungho(true),
+        AgentCardModel.kyungho(false),
+        AgentCardModel.minseok(false),
+      ];
+    }
+
+    _agentChatModels.add(AgentChatModel.selection((body: agentCards)));
     scroll();
   }
 
@@ -72,12 +93,29 @@ class AgentChatController {
     scroll();
   }
 
-  // TODO: integrate API
   Future<void> addAnswer() async {
-    AgentCardModel agentCardModel = AgentCardModel.seungho(false);
+    final agentService = AgentService();
 
-    await Future.delayed(const Duration(seconds: 1));
-    AgentChatModel answer = AgentChatModel.answerExample(agentCardModel);
+    AgentCardModel agentCardModel;
+    String? responseText;
+
+    if (_selectedAgentId != null) {
+      final agent = agentService.getAgentById(_selectedAgentId!);
+      if (agent != null) {
+        agentCardModel = AgentCardModel.fromAgent(agent, isSelected: false);
+        responseText = await agentService.sendMessage(_selectedAgentId!, _input);
+      } else {
+        agentCardModel = AgentCardModel.seungho(false);
+      }
+    } else {
+      agentCardModel = AgentCardModel.seungho(false);
+    }
+
+    final answerBody = responseText ?? 'Unable to get response from agent.';
+    final answer = AgentChatModel.answer((
+      agentCardModel: agentCardModel,
+      body: answerBody,
+    ));
 
     _agentChatModels.add(answer);
     scroll();

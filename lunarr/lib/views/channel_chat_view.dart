@@ -170,6 +170,12 @@ class _ChannelChatViewState extends State<ChannelChatView> {
                               deleteAreSelectedCount();
                               deleteIsConfirmed();
 
+                              final selectedIds = acms
+                                  .where((a) => a.isSelected)
+                                  .map((a) => a.id)
+                                  .toList();
+                              ccc.setSelectedAgentIds(selectedIds);
+
                               await ccc.addThinkings();
                               setState(() {});
 
