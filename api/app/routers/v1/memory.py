@@ -66,9 +66,7 @@ async def search_memories(request: Request, body: SearchMemoryRequest) -> list[M
     """
     # TODO: Replace X-Requester-Id header with proper auth (JWT/API keys)
     memory_manager: MemoryManager = request.app.state.memory_manager
-    owner_id = await _get_agent_owner_id(request, body.agent_id)
-    requester_id = _get_requester_id(request)
-    return await memory_manager.search(body, owner_id, requester_id)
+    return await memory_manager.search(body)
 
 
 @router.put("/{memory_id}")
