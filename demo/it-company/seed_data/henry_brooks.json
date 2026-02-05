@@ -1,13 +1,11 @@
 {
   "agent_id": "henry-brooks",
-  "private_memories": [
+  "memories": [
     {
       "name": "Team Leadership Goals",
       "episode_body": "Focus on building team automation capabilities. Isabel is strong on infrastructure, James needs more mentoring on Kubernetes. Planning to standardize deployment processes across all services.",
       "knowledge_type": "preference"
-    }
-  ],
-  "public_memories": [
+    },
     {
       "name": "Henry Brooks - DevOps Lead",
       "episode_body": "Henry Brooks is DevOps Lead at TechFlow Solutions, leading the DevOps Team. Expert in Docker, Kubernetes, CI/CD automation, cloud infrastructure (AWS/GCP), and reliability engineering. 8 years DevOps experience. Manages Isabel Gomez and James Park.",

@@ -1,13 +1,11 @@
 {
   "agent_id": "nathan-lee",
-  "private_memories": [
+  "memories": [
     {
       "name": "Product Design Collaboration",
       "episode_body": "Work closely with Maya on product strategy and with Olivia's team on design execution. Want to improve customer interview skills and quantitative analysis.",
       "knowledge_type": "preference"
-    }
-  ],
-  "public_memories": [
+    },
     {
       "name": "Nathan Lee - Product Designer",
       "episode_body": "Nathan Lee is Product Designer at TechFlow Solutions on Product team. Specializes in user research, product design, and validating features with customers. 3 years product design experience. Bridges product strategy and design execution.",

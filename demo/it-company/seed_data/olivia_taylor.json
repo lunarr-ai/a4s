@@ -1,6 +1,6 @@
 {
   "agent_id": "olivia-taylor",
-  "private_memories": [
+  "memories": [
     {
       "name": "Team Growth Plans",
       "episode_body": "Paul is ready for more senior responsibilities - consider promoting to Senior UX Designer in Q2. Quinn needs more mentorship on design systems strategy. Planning to hire additional UI designer in Q2 to support growing workload.",
@@ -10,9 +10,7 @@
       "name": "Design Review Schedule",
       "episode_body": "Team design critiques every Thursday 3-4 PM. One-on-ones with Paul on Mondays 1 PM, with Quinn on Tuesdays 10 AM. Design system working group meets bi-weekly Wednesdays 2 PM with frontend team.",
       "knowledge_type": "pattern"
-    }
-  ],
-  "public_memories": [
+    },
     {
       "name": "Olivia Taylor - Design Lead",
       "episode_body": "Olivia Taylor leads the Design Team at TechFlow Solutions, managing Paul Anderson (UX Designer) and Quinn Roberts (UI Designer). Expert in design systems, user research methodology, and design strategy. 9 years design experience, previously led design at SaaS company.",

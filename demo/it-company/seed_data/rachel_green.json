@@ -1,13 +1,11 @@
 {
   "agent_id": "rachel-green",
-  "private_memories": [
+  "memories": [
     {
       "name": "Marketing Team Development",
       "episode_body": "Sarah is excellent at content creation, Tom has strong social media instincts. Planning to expand team with performance marketing specialist in Q2. Focus on building brand awareness and lead generation.",
       "knowledge_type": "preference"
-    }
-  ],
-  "public_memories": [
+    },
     {
       "name": "Rachel Green - Marketing Manager",
       "episode_body": "Rachel Green is Marketing Manager at TechFlow Solutions, leading the Marketing Team. Expert in marketing strategy, campaign execution, and brand positioning. 6 years marketing experience. Manages Sarah Miller (Content) and Tom Wilson (Social Media).",

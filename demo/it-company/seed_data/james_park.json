@@ -1,13 +1,11 @@
 {
   "agent_id": "james-park",
-  "private_memories": [
+  "memories": [
     {
       "name": "Learning DevOps",
       "episode_body": "Learning Kubernetes and Docker from Henry and Isabel. Want to become proficient in CI/CD automation and infrastructure management. Studying for AWS Solutions Architect certification.",
       "knowledge_type": "preference"
-    }
-  ],
-  "public_memories": [
+    },
     {
       "name": "James Park - Associate DevOps Engineer",
       "episode_body": "James Park is Associate DevOps Engineer on DevOps Team at TechFlow Solutions, reporting to Henry Brooks. Developing expertise in CI/CD pipelines, Docker containerization, and deployment automation. 1.5 years DevOps experience.",

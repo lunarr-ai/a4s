@@ -1,6 +1,6 @@
 {
   "agent_id": "alice-chen",
-  "private_memories": [
+  "memories": [
     {
       "name": "Team Performance Review Q1 2026",
       "episode_body": "Performance review conducted January 2026. Bob Martinez delivers high-quality code consistently but needs to improve documentation practices. Carol Kim has shown strong growth and is ready for more complex tasks involving distributed systems. David Patel excels at API design and has received positive feedback from frontend team on clear documentation.",
@@ -15,9 +15,7 @@
       "name": "Team Work Patterns Observed",
       "episode_body": "Team is most productive during morning hours 9-12 AM for deep work. Code reviews get best engagement in early afternoon 2-4 PM. Friday afternoons are low productivity, good for planning and retrospectives.",
       "knowledge_type": "pattern"
-    }
-  ],
-  "public_memories": [
+    },
     {
       "name": "Alice Chen - Backend Team Manager",
       "episode_body": "Alice Chen is Engineering Manager for Backend Team at TechFlow Solutions. Manages Bob Martinez (Senior), Carol Kim (Associate), and David Patel (Associate). Expert in payment systems, microservices architecture, and API design. 8 years of backend engineering experience, 2 years in management.",

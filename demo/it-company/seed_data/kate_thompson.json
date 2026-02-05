@@ -1,13 +1,11 @@
 {
   "agent_id": "kate-thompson",
-  "private_memories": [
+  "memories": [
     {
       "name": "QA Strategy Planning",
       "episode_body": "Focus on expanding E2E test coverage and improving test automation frameworks. Luis is doing well on test automation. Need to hire senior QA engineer for test architecture.",
       "knowledge_type": "preference"
-    }
-  ],
-  "public_memories": [
+    },
     {
       "name": "Kate Thompson - QA Lead",
       "episode_body": "Kate Thompson is QA Lead at TechFlow Solutions, leading the QA Team. Expert in test automation, quality assurance processes, and end-to-end testing strategies. 7 years QA experience. Manages Luis Rodriguez. Ensures quality across all releases.",

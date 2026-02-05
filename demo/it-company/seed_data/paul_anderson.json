@@ -1,6 +1,6 @@
 {
   "agent_id": "paul-anderson",
-  "private_memories": [
+  "memories": [
     {
       "name": "Career Development Goals",
       "episode_body": "Want to deepen expertise in user research methods, particularly quantitative analysis. Interested in learning more about design systems strategy from Olivia. Goal: transition to Senior UX Designer role within 6 months.",
@@ -10,9 +10,7 @@
       "name": "Design Process Preference",
       "episode_body": "Prefer to start with low-fidelity wireframes before high-fidelity mockups. Like to involve stakeholders early for feedback. Work best when doing user research analysis in morning 9-11 AM, design work in afternoon.",
       "knowledge_type": "pattern"
-    }
-  ],
-  "public_memories": [
+    },
     {
       "name": "Paul Anderson - UX Designer",
       "episode_body": "Paul Anderson is UX Designer on Design Team at TechFlow Solutions, reporting to Olivia Taylor. Specializes in user research, wireframing, interaction design, and information architecture. 5 years UX design experience. Works closely with Quinn (UI) and Frontend team.",

@@ -1,13 +1,11 @@
 {
   "agent_id": "sarah-miller",
-  "private_memories": [
+  "memories": [
     {
       "name": "Content Strategy Focus",
       "episode_body": "Enjoy writing technical content that explains complex topics simply. Want to improve SEO skills and analytics interpretation. Collaborate with engineering team for technical accuracy.",
       "knowledge_type": "preference"
-    }
-  ],
-  "public_memories": [
+    },
     {
       "name": "Sarah Miller - Content Marketing Specialist",
       "episode_body": "Sarah Miller is Content Marketing Specialist on Marketing Team at TechFlow Solutions, reporting to Rachel Green. Specializes in content strategy, technical writing, and SEO optimization. 3 years content marketing experience.",

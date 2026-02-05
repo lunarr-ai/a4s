@@ -1,6 +1,6 @@
 {
   "agent_id": "emily-wang",
-  "private_memories": [
+  "memories": [
     {
       "name": "Technical Learning Goals",
       "episode_body": "Want to explore React Server Components and Next.js App Router for future projects. Interested in improving performance optimization skills. Planning to give tech talk on state management patterns in Q2.",
@@ -10,9 +10,7 @@
       "name": "Code Review Philosophy",
       "episode_body": "Prefer detailed code reviews with constructive feedback. Focus on architecture decisions, performance implications, and maintainability. Usually review PRs in morning 9-11 AM. Like to pair program for complex features.",
       "knowledge_type": "pattern"
-    }
-  ],
-  "public_memories": [
+    },
     {
       "name": "Emily Wang - Senior Frontend Engineer",
       "episode_body": "Emily Wang is Senior Frontend Engineer on Frontend Team at TechFlow Solutions. Expert in React, TypeScript, state management (Redux/Zustand), frontend architecture, and performance optimization. 7 years frontend experience. Leads checkout redesign implementation. Collaborates closely with Design team.",

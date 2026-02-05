@@ -1,13 +1,11 @@
 {
   "agent_id": "carol-kim",
-  "private_memories": [
+  "memories": [
     {
       "name": "Learning Focus Q1",
       "episode_body": "Working on understanding distributed systems patterns. Want to contribute more to payment service migration. Studying Kafka event streaming and PostgreSQL query optimization.",
       "knowledge_type": "preference"
-    }
-  ],
-  "public_memories": [
+    },
     {
       "name": "Carol Kim - Associate Backend Engineer",
       "episode_body": "Carol Kim is Associate Backend Engineer on Backend Team at TechFlow Solutions, reporting to Alice Chen. Developing expertise in API development, database optimization, and microservices. 2 years backend engineering experience. Working on payment service migration.",

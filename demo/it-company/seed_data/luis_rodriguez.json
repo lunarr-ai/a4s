@@ -1,13 +1,11 @@
 {
   "agent_id": "luis-rodriguez",
-  "private_memories": [
+  "memories": [
     {
       "name": "Test Automation Learning",
       "episode_body": "Enjoying working on Playwright E2E tests. Want to learn more about performance testing and load testing. Kate is supportive mentor.",
       "knowledge_type": "preference"
-    }
-  ],
-  "public_memories": [
+    },
     {
       "name": "Luis Rodriguez - Associate QA Engineer",
       "episode_body": "Luis Rodriguez is Associate QA Engineer on QA Team at TechFlow Solutions, reporting to Kate Thompson. Specializes in automated testing, bug tracking, and test case design. 2 years QA experience.",

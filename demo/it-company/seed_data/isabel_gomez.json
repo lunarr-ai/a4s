@@ -1,13 +1,11 @@
 {
   "agent_id": "isabel-gomez",
-  "private_memories": [
+  "memories": [
     {
       "name": "Infrastructure Expertise",
       "episode_body": "Specializing in Terraform and infrastructure as code. Want to implement more observability and chaos engineering practices. Planning to get Kubernetes CKA certification.",
       "knowledge_type": "preference"
-    }
-  ],
-  "public_memories": [
+    },
     {
       "name": "Isabel Gomez - Senior DevOps Engineer",
       "episode_body": "Isabel Gomez is Senior DevOps Engineer on DevOps Team at TechFlow Solutions, reporting to Henry Brooks. Expert in infrastructure as code (Terraform), monitoring systems (Prometheus/Grafana), and cloud platforms (AWS/GCP). 5 years DevOps experience.",

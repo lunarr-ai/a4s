@@ -1,13 +1,11 @@
 {
   "agent_id": "frank-johnson",
-  "private_memories": [
+  "memories": [
     {
       "name": "Learning from Emily",
       "episode_body": "Emily is great mentor for React patterns and architecture. Learning about component composition and state management from her code reviews. Want to work on more complex features.",
       "knowledge_type": "preference"
-    }
-  ],
-  "public_memories": [
+    },
     {
       "name": "Frank Johnson - Associate Frontend Engineer",
       "episode_body": "Frank Johnson is Associate Frontend Engineer on Frontend Team at TechFlow Solutions. Developing expertise in React, component development, and modern frontend tooling. 1.5 years frontend experience. Eager to learn from senior team members.",

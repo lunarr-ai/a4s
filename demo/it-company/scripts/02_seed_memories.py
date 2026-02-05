@@ -43,7 +43,6 @@ def add_memory(
     agent_id: str,
     requester_id: str,
     memory_data: dict,
-    visibility: str,
     max_retries: int = 5,
 ) -> dict:
     """Add a single memory via API with retry logic.
@@ -71,7 +70,6 @@ def add_memory(
     payload = {
         "messages": episode_body,
         "agent_id": agent_id,
-        "visibility": visibility,
         "metadata": metadata,
     }
 
@@ -106,53 +104,26 @@ def seed_agent_memories(client: httpx.Client, agent_id: str, agent_name: str) ->
         print(f"  ⊘ No seed data found for {agent_name}")
         return 0, 0
 
-    private_memory_count = 0
-    public_memory_count = 0
+    success_count = 0
 
-    # Seed private memories (requester is the agent itself)
-    private_memories = seed_data.get("private_memories", [])
-    for memory in private_memories:
+    memories = seed_data.get("memories", [])
+    for memory in memories:
         try:
             add_memory(
                 client,
                 agent_id=agent_id,
                 requester_id=agent_name,
                 memory_data=memory,
-                visibility="private",
             )
-            private_memory_count += 1
+            success_count += 1
         except Exception as e:
             print(f"  ✗ Failed to add private memory '{memory.get('name')}': {e}")
         finally:
             # Add delay to allow LLM processing
             time.sleep(10)
 
-    # Seed public memories (requester is the agent itself)
-    public_memories = seed_data.get("public_memories", [])
-    for memory in public_memories:
-        try:
-            add_memory(
-                client,
-                agent_id=agent_id,
-                requester_id=agent_name,
-                memory_data=memory,
-                visibility="public",
-            )
-            public_memory_count += 1
-        except Exception as e:
-            print(f"  ✗ Failed to add public memory '{memory.get('name')}': {e}")
-        finally:
-            # Add delay to allow LLM processing
-            time.sleep(10)
-
-    total_count = len(private_memories) + len(public_memories)
-    success_count = private_memory_count + public_memory_count
-    failed_count = total_count - success_count
-
-    print(f"{private_memory_count}/{len(private_memories)} private memories added.")
-    print(f"{public_memory_count}/{len(public_memories)} public memories added.")
-    print(f"{success_count}/{total_count} total memories added.")
-    return success_count, failed_count
+    print(f"{success_count}/{len(memories)} memories added.")
+    return success_count, len(memories) - success_count
 
 
 def main() -> None:

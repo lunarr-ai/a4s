@@ -1,13 +1,11 @@
 {
   "agent_id": "tom-wilson",
-  "private_memories": [
+  "memories": [
     {
       "name": "Social Media Philosophy",
       "episode_body": "Believe in authentic engagement over vanity metrics. Focus on building community and conversation. Prefer Twitter and LinkedIn for B2B audience. Best posting times: weekdays 9-11 AM and 2-4 PM.",
       "knowledge_type": "preference"
-    }
-  ],
-  "public_memories": [
+    },
     {
       "name": "Tom Wilson - Social Media Manager",
       "episode_body": "Tom Wilson is Social Media Manager on Marketing Team at TechFlow Solutions, reporting to Rachel Green. Manages social media strategy, community engagement, and brand voice across platforms. 4 years social media experience.",
