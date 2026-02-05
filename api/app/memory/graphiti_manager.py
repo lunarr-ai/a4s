@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import re
 from collections.abc import Awaitable, Callable, Iterable
 from datetime import UTC, datetime
 
@@ -19,6 +20,8 @@ from app.config import config as default_config
 from app.memory.manager import MemoryManager
 from app.memory.models import (
     CreateMemoryRequest,
+    IngestDocumentRequest,
+    IngestDocumentResponse,
     Memory,
     QueuedMemoryResponse,
     SearchMemoryRequest,
@@ -271,6 +274,46 @@ class GraphitiMemoryManager(MemoryManager):
         if requester_id != owner_id:
             raise PermissionError("Only the owner can delete agent memory")
         await self._graphiti.remove_episode(memory_id)
+
+    async def ingest_document(
+        self, request: IngestDocumentRequest, owner_id: str, requester_id: str
+    ) -> IngestDocumentResponse:
+        """Ingest a document into memory.
+
+        Args:
+            request: Document ingestion request.
+            owner_id: ID of the agent's owner.
+            requester_id: ID of the requester.
+
+        Returns:
+            Response indicating the document has been queued.
+
+        Raises:
+            PermissionError: If requester is not the owner.
+        """
+        if requester_id != owner_id:
+            raise PermissionError("Only the owner can write to agent memory")
+
+        group_id = self._build_group_id(request.agent_id)
+        safe_source = re.sub(r"[^\w\-.]", "_", request.source)
+        name = f"doc_{safe_source}_{datetime.now(UTC).isoformat()}"
+
+        async def process_episode() -> None:
+            await self._graphiti.add_episode(
+                name=name,
+                episode_body=request.content,
+                source=EpisodeType.text,
+                source_description=f"document:{request.format.value}:{request.source}",
+                reference_time=datetime.now(UTC),
+                group_id=group_id,
+            )
+
+        await self._enqueue_episode(group_id, process_episode)
+
+        return IngestDocumentResponse(
+            message=f"Document '{request.source}' queued for processing",
+            group_id=group_id,
+        )
 
     async def close(self) -> None:
         for task in self._workers.values():

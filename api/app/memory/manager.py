@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 
 from app.memory.models import (
     CreateMemoryRequest,
+    IngestDocumentRequest,
+    IngestDocumentResponse,
     Memory,
     QueuedMemoryResponse,
     SearchMemoryRequest,
@@ -51,6 +53,24 @@ class MemoryManager(ABC):
             memory_id: ID of the memory to delete.
             owner_id: ID of the agent's owner.
             requester_id: ID of the requester.
+
+        Raises:
+            PermissionError: If requester is not the owner.
+        """
+
+    @abstractmethod
+    async def ingest_document(
+        self, request: IngestDocumentRequest, owner_id: str, requester_id: str
+    ) -> IngestDocumentResponse:
+        """Ingest a document into memory.
+
+        Args:
+            request: Document ingestion request.
+            owner_id: ID of the agent's owner.
+            requester_id: ID of the requester.
+
+        Returns:
+            Response indicating the document has been queued.
 
         Raises:
             PermissionError: If requester is not the owner.

@@ -39,39 +39,7 @@ async def mcp_lifespan(_server: FastMCP) -> AsyncIterator[AppContext]:
         yield AppContext(client=client)
 
 
-SERVER_INSTRUCTIONS = """A4S enables agent orchestration, skills, and memory.
-
-<agent-collaboration>
-To delegate work to other agents:
-1. Search for agents matching the task (use specific terms like "addition" not generic "math")
-2. Select agent(s) whose description directly matches the task
-3. Send the task to selected agent(s) and return their response(s)
-</agent-collaboration>
-
-<skills>
-To use a skill:
-1. Search for skills by capability
-2. Read the skill's instructions resource
-3. Activate the skill for detailed guidance
-</skills>
-
-<memory>
-Store context for semantic retrieval to enable better reasoning in future interactions.
-
-When to add memory:
-- User preference is shared (e.g., "I prefer dark mode", "Call me Alex")
-- Decision or suggestion is made that should persist
-- Goal or task is completed
-- New entity is introduced (person, project, concept)
-- User gives feedback or clarification
-
-All memories are public. Only the owner can write/delete memories.
-
-NEVER store sensitive info (credentials, API keys, passwords, PII) in memory.
-</memory>
-"""
-
-mcp = FastMCP("A4S MCP Server", instructions=SERVER_INSTRUCTIONS, lifespan=mcp_lifespan)
+mcp = FastMCP("A4S MCP Server", lifespan=mcp_lifespan)
 
 
 @mcp.tool()
@@ -81,6 +49,9 @@ async def search_agents(
     limit: int = 10,
 ) -> dict:
     """Search for agents by name, description, or capability.
+
+    Use specific terms (e.g., "addition") not generic ones (e.g., "math").
+    Select agents whose description directly matches the task.
 
     Args:
         query: Search query (e.g., "code review").
@@ -103,6 +74,12 @@ async def send_a2a_message(  # noqa: C901
     message: str,
 ) -> dict:
     """Send a message to an agent via A2A protocol.
+
+    After finding agents with search_agents, use this to delegate work.
+    Return the agent's response to the user.
+
+    Do NOT use for tasks you can complete directly (simple calculations,
+    text formatting, answering from context). Only delegate specialized work.
 
     Args:
         agent_id: Agent ID from search_agents.
@@ -140,7 +117,7 @@ async def send_a2a_message(  # noqa: C901
     state = "unknown"
 
     if isinstance(response.root, JSONRPCErrorResponse):
-        raise ToolError(f"A2A error: {response.root.error.message}")
+        raise ToolError(f"Agent '{agent_id}' error: {response.root.error.message}")
 
     def extract_text(parts: list) -> list[str]:
         texts = []
@@ -173,6 +150,8 @@ async def search_skills(
 ) -> dict:
     """Search for skills by name or description.
 
+    After finding a skill, read its instructions resource, then activate it.
+
     Args:
         query: Search query (e.g., "create PDF").
         limit: Max results (default 10).
@@ -192,16 +171,26 @@ async def search_skills(
 async def add_memory(
     ctx: Context[ServerSession, AppContext],
     messages: str | list[dict[str, str]],
-    agent_id: str,
 ) -> dict:
     """Store a memory.
 
+    Call this when:
+    - User shares a preference (e.g., "I prefer dark mode")
+    - A decision or suggestion is made that should persist
+    - A goal or task is completed
+    - A new entity is introduced (person, project, concept)
+    - User gives feedback or clarification
+
+    NEVER store sensitive info (credentials, API keys, passwords, PII).
+
+    Note: Returns a group_id for the batch. To get individual memory IDs
+    for update_memory or delete_memory, use search_memories.
+
     Args:
         messages: Conversation [{"role": "user", "content": "..."}] or plain text.
-        agent_id: Agent identifier for scoping (required).
     """
     client = ctx.request_context.lifespan_context.client
-    payload: dict = {"messages": messages, "agent_id": agent_id}
+    payload: dict = {"messages": messages, "agent_id": config.requester_id}
     resp = await client.post("/api/v1/memories", json=payload)
     resp.raise_for_status()
     data = resp.json()
@@ -212,18 +201,24 @@ async def add_memory(
 async def search_memories(
     ctx: Context[ServerSession, AppContext],
     query: str,
-    agent_id: str,
     limit: int = 10,
 ) -> dict:
     """Search memories for an agent.
 
+    IMPORTANT: Call this proactively:
+    - At the start of conversations to recall user context
+    - Before answering questions that might relate to stored knowledge
+    - When the user references something previously discussed
+    - When you need background information to answer accurately
+
+    Do NOT use for finding agents (use search_agents) or skills (use search_skills).
+
     Args:
         query: Natural language search (e.g., "color preferences").
-        agent_id: Agent identifier for scoping (required).
         limit: Max results (default 10).
     """
     client = ctx.request_context.lifespan_context.client
-    payload = {"query": query, "agent_id": agent_id, "limit": limit}
+    payload = {"query": query, "agent_id": config.requester_id, "limit": limit}
     resp = await client.post("/api/v1/memories/search", json=payload)
     resp.raise_for_status()
     data = resp.json()
@@ -254,16 +249,14 @@ async def update_memory(
 async def delete_memory(
     ctx: Context[ServerSession, AppContext],
     memory_id: str,
-    agent_id: str,
 ) -> dict:
     """Delete a memory. Only owner can delete.
 
     Args:
         memory_id: ID from search_memories.
-        agent_id: Agent identifier owning the memory (required).
     """
     client = ctx.request_context.lifespan_context.client
-    resp = await client.delete(f"/api/v1/memories/{memory_id}", params={"agent_id": agent_id})
+    resp = await client.delete(f"/api/v1/memories/{memory_id}", params={"agent_id": config.requester_id})
     resp.raise_for_status()
     return {"deleted": True, "memory_id": memory_id}
 
