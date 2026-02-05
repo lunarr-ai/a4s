@@ -78,6 +78,9 @@ async def send_a2a_message(  # noqa: C901
     After finding agents with search_agents, use this to delegate work.
     Return the agent's response to the user.
 
+    Do NOT use for tasks you can complete directly (simple calculations,
+    text formatting, answering from context). Only delegate specialized work.
+
     Args:
         agent_id: Agent ID from search_agents.
         message: Text message to send.
@@ -114,7 +117,7 @@ async def send_a2a_message(  # noqa: C901
     state = "unknown"
 
     if isinstance(response.root, JSONRPCErrorResponse):
-        raise ToolError(f"A2A error: {response.root.error.message}")
+        raise ToolError(f"Agent '{agent_id}' error: {response.root.error.message}")
 
     def extract_text(parts: list) -> list[str]:
         texts = []
@@ -180,6 +183,9 @@ async def add_memory(
 
     NEVER store sensitive info (credentials, API keys, passwords, PII).
 
+    Note: Returns a group_id for the batch. To get individual memory IDs
+    for update_memory or delete_memory, use search_memories.
+
     Args:
         messages: Conversation [{"role": "user", "content": "..."}] or plain text.
     """
@@ -204,6 +210,8 @@ async def search_memories(
     - Before answering questions that might relate to stored knowledge
     - When the user references something previously discussed
     - When you need background information to answer accurately
+
+    Do NOT use for finding agents (use search_agents) or skills (use search_skills).
 
     Args:
         query: Natural language search (e.g., "color preferences").
