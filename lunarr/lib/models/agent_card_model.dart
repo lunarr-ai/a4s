@@ -34,7 +34,7 @@ class AgentCardModel {
       id: agent.id,
       iconString: 'assets/avatars/$avatarIndex.png',
       name: agent.name,
-      distributionList: agent.id,
+      distributionList: agent.id, // TODO: usage of distributionList must be discussed after removal of owner_id
       description: agent.description,
       instruction: agent.spawnConfig?.instruction ?? '',
       model: agent.spawnConfig?.model.displayName ?? 'Unknown',

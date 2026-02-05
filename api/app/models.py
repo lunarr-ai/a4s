@@ -61,6 +61,8 @@ class SpawnConfig(BaseModel):
     tools: list[str] = Field(default_factory=list, description="Enabled tools for the agent.")
 
 
+# Removed owner_id field from Agent model to simplify ownership management.
+# The agent itself is its owner in this design.
 class Agent(BaseModel):
     """Metadata for an AI agent runtime."""
 

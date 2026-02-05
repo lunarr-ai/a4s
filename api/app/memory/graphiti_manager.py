@@ -151,22 +151,22 @@ class GraphitiMemoryManager(MemoryManager):
     def _build_group_id(self, agent_id: str) -> str:
         return f"agent-{agent_id}"
 
-    async def add(self, request: CreateMemoryRequest, owner_id: str, requester_id: str) -> QueuedMemoryResponse:
+    async def add(self, request: CreateMemoryRequest, target_agent_id: str, requester_id: str) -> QueuedMemoryResponse:
         """Add a new memory to the knowledge graph.
 
         Args:
             request: Memory creation request.
-            owner_id: ID of the agent's owner.
+            target_agent_id: ID of the target agent.
             requester_id: ID of the requester.
 
         Returns:
             Response indicating the memory has been queued for processing.
 
         Raises:
-            PermissionError: If requester is not the owner.
+            PermissionError: If requester is not the target agent.
         """
-        if requester_id != owner_id:
-            raise PermissionError("Only the owner can write to agent memory")
+        if requester_id != target_agent_id:
+            raise PermissionError("Requester should match the target agent to add memory")
 
         if isinstance(request.messages, str):
             body = request.messages
@@ -260,39 +260,39 @@ class GraphitiMemoryManager(MemoryManager):
             "Add new information as a new memory to update the knowledge graph."
         )
 
-    async def delete(self, memory_id: str, owner_id: str, requester_id: str) -> None:
+    async def delete(self, memory_id: str, target_agent_id: str, requester_id: str) -> None:
         """Delete a memory.
 
         Args:
             memory_id: ID of the memory to delete.
-            owner_id: ID of the agent's owner.
+            target_agent_id: ID of the target agent.
             requester_id: ID of the requester.
 
         Raises:
-            PermissionError: If requester is not the owner.
+            PermissionError: If requester is not the target agent.
         """
-        if requester_id != owner_id:
-            raise PermissionError("Only the owner can delete agent memory")
+        if requester_id != target_agent_id:
+            raise PermissionError("Requester should match the target agent to delete memory")
         await self._graphiti.remove_episode(memory_id)
 
     async def ingest_document(
-        self, request: IngestDocumentRequest, owner_id: str, requester_id: str
+        self, request: IngestDocumentRequest, target_agent_id: str, requester_id: str
     ) -> IngestDocumentResponse:
         """Ingest a document into memory.
 
         Args:
             request: Document ingestion request.
-            owner_id: ID of the agent's owner.
+            target_agent_id: ID of the target agent.
             requester_id: ID of the requester.
 
         Returns:
             Response indicating the document has been queued.
 
         Raises:
-            PermissionError: If requester is not the owner.
+            PermissionError: If requester is not the target agent.
         """
-        if requester_id != owner_id:
-            raise PermissionError("Only the owner can write to agent memory")
+        if requester_id != target_agent_id:
+            raise PermissionError("Requester should match the target agent to write memory")
 
         group_id = self._build_group_id(request.agent_id)
         safe_source = re.sub(r"[^\w\-.]", "_", request.source)
