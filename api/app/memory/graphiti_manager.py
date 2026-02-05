@@ -223,13 +223,11 @@ class GraphitiMemoryManager(MemoryManager):
         finally:
             self._workers.pop(group_id, None)
 
-    async def search(self, request: SearchMemoryRequest, _owner_id: str, _requester_id: str) -> list[Memory]:
+    async def search(self, request: SearchMemoryRequest) -> list[Memory]:
         """Search for memories.
 
         Args:
             request: Search request.
-            _owner_id: Unused (all memories are public).
-            _requester_id: Unused (all memories are public).
 
         Returns:
             List of matching memories.
