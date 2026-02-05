@@ -16,7 +16,6 @@ class EmbeddingProvider(str, Enum):
 
 
 class MemoryProvider(str, Enum):
-    MEM0 = "mem0"
     GRAPHITI = "graphiti"
 
 
@@ -62,7 +61,7 @@ class Config(BaseSettings):
     memory_qdrant_collection: str = "memories"
 
     # Memory provider selection
-    memory_provider: MemoryProvider = MemoryProvider.MEM0
+    memory_provider: MemoryProvider = MemoryProvider.GRAPHITI
 
     # Graphiti - FalkorDB
     graphiti_falkordb_host: str = "localhost"

@@ -1,14 +1,6 @@
-from enum import Enum
 from typing import Any
 
 from pydantic import BaseModel, Field
-
-
-class MemoryVisibility(str, Enum):
-    """Visibility level for memory storage."""
-
-    PRIVATE = "private"
-    PUBLIC = "public"
 
 
 class Memory(BaseModel):
@@ -31,10 +23,6 @@ class CreateMemoryRequest(BaseModel):
         ],
     )
     agent_id: str = Field(description="Agent identifier for scoping.")
-    visibility: MemoryVisibility = Field(
-        default=MemoryVisibility.PUBLIC,
-        description="Visibility level: private (owner only) or public (anyone can read).",
-    )
     metadata: dict[str, Any] | None = Field(default=None, description="Additional metadata.")
 
 

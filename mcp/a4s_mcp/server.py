@@ -65,17 +65,7 @@ When to add memory:
 - New entity is introduced (person, project, concept)
 - User gives feedback or clarification
 
-Visibility guide:
-- PRIVATE: Owner-specific info (preferences, current tasks, personal context, session state)
-- PUBLIC (default): General knowledge useful to anyone (domain facts, stable knowledge)
-
-Examples:
-| Memory | Visibility |
-|--------|------------|
-| "User prefers concise responses" | private |
-| "Python uses indentation for blocks" | public |
-| "Currently debugging auth flow" | private |
-| "JWT tokens should be validated on every request" | public |
+All memories are public. Only the owner can write/delete memories.
 
 NEVER store sensitive info (credentials, API keys, passwords, PII) in memory.
 </memory>
@@ -203,17 +193,15 @@ async def add_memory(
     ctx: Context[ServerSession, AppContext],
     messages: str | list[dict[str, str]],
     agent_id: str,
-    visibility: str = "public",
 ) -> dict:
     """Store a memory.
 
     Args:
         messages: Conversation [{"role": "user", "content": "..."}] or plain text.
         agent_id: Agent identifier for scoping (required).
-        visibility: "private" (owner only) or "public" (default, anyone can read).
     """
     client = ctx.request_context.lifespan_context.client
-    payload: dict = {"messages": messages, "agent_id": agent_id, "visibility": visibility}
+    payload: dict = {"messages": messages, "agent_id": agent_id}
     resp = await client.post("/api/v1/memories", json=payload)
     resp.raise_for_status()
     data = resp.json()
@@ -227,7 +215,7 @@ async def search_memories(
     agent_id: str,
     limit: int = 10,
 ) -> dict:
-    """Search memories. Owner sees private+public; others see public only.
+    """Search memories for an agent.
 
     Args:
         query: Natural language search (e.g., "color preferences").

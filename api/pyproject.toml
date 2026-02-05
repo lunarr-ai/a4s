@@ -29,16 +29,13 @@ sqlite = [
     "greenlet>=3.3.1",
     "sqlite-vec>=0.1.6",
 ]
-mem0 = [
-    "mem0ai>=1.0.2",
-]
 graphiti = [
     "graphiti-core[falkordb]>=0.26.3",
 ]
 
 [tool.uv]
 package = true
-default-groups = ["docker", "qdrant", "sqlite", "mem0", "graphiti"]
+default-groups = ["docker", "qdrant", "sqlite", "graphiti"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["app"]

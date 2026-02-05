@@ -145,13 +145,8 @@ class GraphitiMemoryManager(MemoryManager):
 
         raise ValueError(f"Unsupported embedding provider for Graphiti: {config.memory_embedding_provider}")
 
-    def _build_write_group_id(self, agent_id: str, visibility: str) -> str:
-        return f"agent-{agent_id}-{visibility}"
-
-    def _build_search_group_ids(self, agent_id: str, requester_id: str, owner_id: str) -> list[str]:
-        if requester_id == owner_id:
-            return [f"agent-{agent_id}-private", f"agent-{agent_id}-public"]
-        return [f"agent-{agent_id}-public"]
+    def _build_group_id(self, agent_id: str) -> str:
+        return f"agent-{agent_id}"
 
     async def add(self, request: CreateMemoryRequest, owner_id: str, requester_id: str) -> QueuedMemoryResponse:
         """Add a new memory to the knowledge graph.
@@ -175,7 +170,7 @@ class GraphitiMemoryManager(MemoryManager):
         else:
             body = "\n".join(f"{m['role']}: {m['content']}" for m in request.messages)
 
-        group_id = self._build_write_group_id(request.agent_id, request.visibility.value)
+        group_id = self._build_group_id(request.agent_id)
         name = f"memory_{datetime.now(UTC).isoformat()}"
 
         async def process_episode() -> None:
@@ -228,18 +223,18 @@ class GraphitiMemoryManager(MemoryManager):
         finally:
             self._workers.pop(group_id, None)
 
-    async def search(self, request: SearchMemoryRequest, owner_id: str, requester_id: str) -> list[Memory]:
-        """Search for memories with access control.
+    async def search(self, request: SearchMemoryRequest, _owner_id: str, _requester_id: str) -> list[Memory]:
+        """Search for memories.
 
         Args:
             request: Search request.
-            owner_id: ID of the agent's owner.
-            requester_id: ID of the requester for access control.
+            _owner_id: Unused (all memories are public).
+            _requester_id: Unused (all memories are public).
 
         Returns:
-            List of matching memories based on access level.
+            List of matching memories.
         """
-        group_ids = self._build_search_group_ids(request.agent_id, requester_id, owner_id)
+        group_ids = [self._build_group_id(request.agent_id)]
 
         edges = await self._graphiti.search(
             query=request.query,
