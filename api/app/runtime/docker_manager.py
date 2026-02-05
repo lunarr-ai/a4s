@@ -89,7 +89,6 @@ class DockerRuntimeManager(RuntimeManager):
                 f"{LABEL_PREFIX}.name": request.name,
                 f"{LABEL_PREFIX}.description": request.description,
                 f"{LABEL_PREFIX}.version": request.version,
-                f"{LABEL_PREFIX}.owner_id": request.owner_id,
             }
             environment = {
                 "AGENT_NAME": request.name,
@@ -122,7 +121,6 @@ class DockerRuntimeManager(RuntimeManager):
                 version=request.version,
                 url=f"http://{container_name}:{CONTAINER_PORT}",
                 port=CONTAINER_PORT,
-                owner_id=request.owner_id,
                 status=AgentStatus.RUNNING,
             )
         except DockerException as e:
@@ -154,7 +152,6 @@ class DockerRuntimeManager(RuntimeManager):
                 version=labels.get(f"{LABEL_PREFIX}.version", ""),
                 url="",
                 port=0,
-                owner_id=labels.get(f"{LABEL_PREFIX}.owner_id", ""),
                 status=AgentStatus.STOPPED,
             )
         except NotFound as e:
@@ -182,7 +179,6 @@ class DockerRuntimeManager(RuntimeManager):
                     version=labels.get(f"{LABEL_PREFIX}.version", ""),
                     url=f"http://{c.name}:{CONTAINER_PORT}",
                     port=CONTAINER_PORT,
-                    owner_id=labels.get(f"{LABEL_PREFIX}.owner_id", ""),
                     status=self._map_status(c.status),
                 )
             )

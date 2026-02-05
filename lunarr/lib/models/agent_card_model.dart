@@ -34,7 +34,7 @@ class AgentCardModel {
       id: agent.id,
       iconString: 'assets/avatars/$avatarIndex.png',
       name: agent.name,
-      distributionList: agent.ownerId,
+      distributionList: agent.id,
       description: agent.description,
       instruction: agent.spawnConfig?.instruction ?? '',
       model: agent.spawnConfig?.model.displayName ?? 'Unknown',

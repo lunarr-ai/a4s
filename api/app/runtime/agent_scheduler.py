@@ -83,7 +83,6 @@ class AgentScheduler:
             description=agent.description,
             instruction=agent.spawn_config.instruction,
             tools=agent.spawn_config.tools,
-            owner_id=agent.owner_id,
         )
         self._runtime.spawn_agent(spawn_request)
         await self._wait_for_ready(agent.url)

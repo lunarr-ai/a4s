@@ -13,4 +13,3 @@ class SpawnAgentRequest(BaseModel):
     description: str = Field(description="The description of the agent for human.")
     instruction: str = Field(description="The additional instruction of the agent.")
     tools: list[str] = Field(description="The enabled tools of the agent.")
-    owner_id: str = Field(description="The ID of the agent's owner.")

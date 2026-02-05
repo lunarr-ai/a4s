@@ -148,7 +148,6 @@ register_agent() {
     "description": "${description}",
     "version": "${AGENT_VERSION}",
     "port": ${AGENT_PORT},
-    "owner_id": "e2e-test-owner",
     "spawn_config": {
         "image": "${IMAGE_NAME}",
         "model": {
