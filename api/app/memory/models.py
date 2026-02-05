@@ -1,6 +1,23 @@
+from enum import Enum
 from typing import Any
 
 from pydantic import BaseModel, Field
+
+
+class DocumentFormat(str, Enum):
+    """Supported document formats for ingestion."""
+
+    MARKDOWN = "markdown"
+    TEXT = "text"
+
+
+MAX_DOCUMENT_SIZE = 200_000  # characters
+
+ALLOWED_EXTENSIONS: dict[str, DocumentFormat] = {
+    ".md": DocumentFormat.MARKDOWN,
+    ".markdown": DocumentFormat.MARKDOWN,
+    ".txt": DocumentFormat.TEXT,
+}
 
 
 class Memory(BaseModel):
@@ -48,3 +65,19 @@ class QueuedMemoryResponse(BaseModel):
 
     message: str = Field(description="Status message.")
     group_id: str = Field(description="Group ID the memory belongs to.")
+
+
+class IngestDocumentRequest(BaseModel):
+    """Internal request model for document ingestion after file processing."""
+
+    content: str = Field(description="Document content.")
+    agent_id: str = Field(description="Agent identifier for scoping.")
+    format: DocumentFormat = Field(description="Document format.")
+    source: str = Field(description="Source filename.")
+
+
+class IngestDocumentResponse(BaseModel):
+    """Response when document is queued for ingestion."""
+
+    message: str = Field(description="Status message.")
+    group_id: str = Field(description="Group ID the document belongs to.")

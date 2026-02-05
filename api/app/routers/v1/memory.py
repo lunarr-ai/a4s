@@ -1,9 +1,14 @@
+from pathlib import Path
 from typing import TYPE_CHECKING, Annotated
 
-from fastapi import APIRouter, HTTPException, Query, Request
+from fastapi import APIRouter, File, Form, HTTPException, Query, Request, UploadFile
 
 from app.memory.models import (
+    ALLOWED_EXTENSIONS,
+    MAX_DOCUMENT_SIZE,
     CreateMemoryRequest,
+    IngestDocumentRequest,
+    IngestDocumentResponse,
     Memory,
     QueuedMemoryResponse,
     SearchMemoryRequest,
@@ -104,5 +109,64 @@ async def delete_memory(
 
     try:
         await memory_manager.delete(memory_id, owner_id, requester_id)
+    except PermissionError as e:
+        raise HTTPException(status_code=403, detail=str(e)) from e
+
+
+@router.post("/ingest-document", status_code=202)
+async def ingest_document(
+    request: Request,
+    file: Annotated[UploadFile, File(description="Document file (.md, .txt)")],
+    agent_id: Annotated[str, Form(description="Agent identifier for scoping")],
+) -> IngestDocumentResponse:
+    """Ingest a document file into agent memory.
+
+    Args:
+        request: FastAPI request object.
+        file: Uploaded document file (markdown or text).
+        agent_id: Agent identifier for scoping.
+
+    Returns:
+        Response indicating the document has been queued.
+
+    Raises:
+        HTTPException: If file format is invalid or content too large.
+    """
+    filename = file.filename or "unknown.txt"
+    ext = Path(filename).suffix.lower()
+    if ext not in ALLOWED_EXTENSIONS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unsupported file format '{ext}'. Allowed: {list(ALLOWED_EXTENSIONS.keys())}",
+        )
+    doc_format = ALLOWED_EXTENSIONS[ext]
+
+    content_bytes = await file.read()
+    try:
+        content = content_bytes.decode("utf-8")
+    except UnicodeDecodeError as e:
+        raise HTTPException(status_code=400, detail="File must be valid UTF-8 text") from e
+
+    if len(content) > MAX_DOCUMENT_SIZE:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Document exceeds maximum size of {MAX_DOCUMENT_SIZE} characters",
+        )
+    if not content.strip():
+        raise HTTPException(status_code=400, detail="Document content cannot be empty")
+
+    doc_request = IngestDocumentRequest(
+        content=content,
+        agent_id=agent_id,
+        format=doc_format,
+        source=filename,
+    )
+
+    memory_manager: MemoryManager = request.app.state.memory_manager
+    owner_id = await _get_agent_owner_id(request, agent_id)
+    requester_id = _get_requester_id(request)
+
+    try:
+        return await memory_manager.ingest_document(doc_request, owner_id, requester_id)
     except PermissionError as e:
         raise HTTPException(status_code=403, detail=str(e)) from e
