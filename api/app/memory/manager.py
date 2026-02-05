@@ -29,13 +29,11 @@ class MemoryManager(ABC):
         """
 
     @abstractmethod
-    async def search(self, request: SearchMemoryRequest, owner_id: str, requester_id: str) -> list[Memory]:
+    async def search(self, request: SearchMemoryRequest) -> list[Memory]:
         """Search for memories.
 
         Args:
             request: Search request.
-            owner_id: ID of the agent's owner.
-            requester_id: ID of the requester for access control.
 
         Returns:
             List of matching memories based on access level.
