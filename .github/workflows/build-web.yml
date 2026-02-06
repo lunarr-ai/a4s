@@ -23,7 +23,7 @@ jobs:
         with:
           channel: stable
 
-      - run: flutter build web --base-href /flutter-app/
+      - run: flutter build web --release --base-href /flutter-app/ --dart-define=API_BASE_URL=https://api.a4s.sh
 
       - name: Package build
         run: tar -czf flutter-web.tar.gz -C build/web .
