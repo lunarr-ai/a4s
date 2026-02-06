@@ -1,0 +1,37 @@
+name: Build Flutter Web
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "lunarr/**"
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: lunarr
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - run: flutter build web --base-href /flutter-app/
+
+      - name: Package build
+        run: tar -czf flutter-web.tar.gz -C build/web .
+
+      - name: Publish release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: web-latest
+          allowUpdates: true
+          artifacts: lunarr/flutter-web.tar.gz
+          body: "Latest Flutter web build from ${{ github.sha }}"
