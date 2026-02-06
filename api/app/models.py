@@ -61,6 +61,8 @@ class SpawnConfig(BaseModel):
     tools: list[str] = Field(default_factory=list, description="Enabled tools for the agent.")
 
 
+# Removed owner_id field from Agent model to simplify ownership management.
+# The agent itself is its owner in this design.
 class Agent(BaseModel):
     """Metadata for an AI agent runtime."""
 
@@ -70,7 +72,6 @@ class Agent(BaseModel):
     version: str = Field(description="The version of the agent.")
     url: str = Field(description="The URL of the agent.")
     port: int = Field(description="The port of the agent.")
-    owner_id: str = Field(description="The ID of the agent's owner.")
     status: AgentStatus = Field(description="The status of the agent.", default=AgentStatus.PENDING)
     created_at: datetime = Field(description="The timestamp of the agent creation.", default_factory=datetime.now)
     mode: AgentMode = Field(default=AgentMode.SERVERLESS, description="Runtime mode of the agent.")

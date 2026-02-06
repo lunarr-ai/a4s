@@ -16,18 +16,11 @@ from app.memory.models import (
 )
 
 if TYPE_CHECKING:
-    from app.broker.registry import AgentRegistry
     from app.memory.manager import MemoryManager
 
 router = APIRouter(prefix="/memories", tags=["memories"])
 
 REQUESTER_ID_HEADER = "X-Requester-Id"
-
-
-async def _get_agent_owner_id(request: Request, agent_id: str) -> str:
-    registry: AgentRegistry = request.app.state.registry
-    agent = await registry.get_agent(agent_id)
-    return agent.owner_id
 
 
 def _get_requester_id(request: Request) -> str:
@@ -49,11 +42,10 @@ async def add_memory(request: Request, body: CreateMemoryRequest) -> Memory | Qu
         The created memory or queued response depending on the provider.
     """
     memory_manager: MemoryManager = request.app.state.memory_manager
-    owner_id = await _get_agent_owner_id(request, body.agent_id)
     requester_id = _get_requester_id(request)
 
     try:
-        return await memory_manager.add(body, owner_id, requester_id)
+        return await memory_manager.add(body, body.agent_id, requester_id)
     except PermissionError as e:
         raise HTTPException(status_code=403, detail=str(e)) from e
 
@@ -104,11 +96,10 @@ async def delete_memory(
         agent_id: Agent ID owning the memory.
     """
     memory_manager: MemoryManager = request.app.state.memory_manager
-    owner_id = await _get_agent_owner_id(request, agent_id)
     requester_id = _get_requester_id(request)
 
     try:
-        await memory_manager.delete(memory_id, owner_id, requester_id)
+        await memory_manager.delete(memory_id, agent_id, requester_id)
     except PermissionError as e:
         raise HTTPException(status_code=403, detail=str(e)) from e
 
@@ -163,10 +154,9 @@ async def ingest_document(
     )
 
     memory_manager: MemoryManager = request.app.state.memory_manager
-    owner_id = await _get_agent_owner_id(request, agent_id)
     requester_id = _get_requester_id(request)
 
     try:
-        return await memory_manager.ingest_document(doc_request, owner_id, requester_id)
+        return await memory_manager.ingest_document(doc_request, agent_id, requester_id)
     except PermissionError as e:
         raise HTTPException(status_code=403, detail=str(e)) from e

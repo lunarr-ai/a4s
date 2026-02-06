@@ -2,7 +2,7 @@
 
 ## Overview
 
-A4S provides memory storage for agents using Graphiti's knowledge graph with `group_id`-based namespacing. All memories are public and readable by anyone. Only the owner can write or delete memories.
+A4S provides memory storage for agents using Graphiti's knowledge graph with `group_id`-based namespacing. All memories are public and readable by anyone. Only the agent itself can write to or delete its own memories.
 
 ## End-to-End Flow
 
@@ -14,7 +14,7 @@ flowchart TB
     end
 
     subgraph Agents
-        AgentA[Agent A<br/>owner: Owner]
+        AgentA[Agent A]
         AgentB[Agent B]
     end
 
@@ -32,7 +32,7 @@ flowchart TB
 
     AgentA -->|"read/write"| AC
 
-    AC -->|"owner: read/write/delete"| Memory
+    AC -->|"target agent: read/write/delete"| Memory
     AC -->|"others: read only"| Memory
 ```
 
@@ -47,10 +47,10 @@ sequenceDiagram
 
     User->>Agent: Send message
     Agent->>MemoryLayer: add(messages) via X-Requester-Id header
-    MemoryLayer->>MemoryLayer: Check: is requester owner?
-    alt Not owner
+    MemoryLayer->>MemoryLayer: Check: is requester the target agent?
+    alt Not target agent
         MemoryLayer-->>Agent: 403 Forbidden
-    else Is owner
+    else Is target agent
         MemoryLayer->>MemoryLayer: Build group_id: agent-{id}
         MemoryLayer->>Store: add(content, group_id)
         Store->>Store: Process & extract facts
@@ -80,16 +80,16 @@ sequenceDiagram
 
 ### Ownership Model
 
-- Each agent has exactly one **owner** (1:1 relationship)
-- Owner is assigned by admin or agent creator
-- Only agents are first-class entities in the memory system
+- Each agent owns its own memory namespace
+- Only the agent itself can write to or delete its memories
+- All memories are readable by any requester (public read access)
 
 ### Memory Access
 
-| Requester | Read | Write | Delete |
-| --------- | ---- | ----- | ------ |
-| Owner     | Yes  | Yes   | Yes    |
-| Others    | Yes  | No    | No     |
+| Requester    | Read | Write | Delete |
+| ------------ | ---- | ----- | ------ |
+| Target Agent | Yes  | Yes   | Yes    |
+| Others       | Yes  | No    | No     |
 
 ## group_id Structure
 
@@ -124,9 +124,10 @@ class SearchMemoryRequest(BaseModel):
 ### Headers
 
 Memory operations require the `X-Requester-Id` header for access control:
-- `POST /memories` - requester must be owner to write
+
+- `POST /memories` - requester must be the target agent to write
 - `POST /memories/search` - anyone can search
-- `DELETE /memories/{id}` - requester must be owner to delete
+- `DELETE /memories/{id}` - requester must be the target agent to delete
 
 ### Access Control Flow
 
@@ -134,7 +135,7 @@ Memory operations require the `X-Requester-Id` header for access control:
 Write/Delete Request
     |
     v
-Is requester the owner?
+Is requester the target agent?
     |
     +-- No --> Reject (403)
     |

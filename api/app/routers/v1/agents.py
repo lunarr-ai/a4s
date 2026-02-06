@@ -27,7 +27,6 @@ class RegisterAgentRequest(BaseModel):
         description="URL where the agent is accessible. Auto-generated for managed agents. Provide only for external agents not managed by A4S.",
     )
     port: int = Field(description="Port the agent listens on.", default=8000)
-    owner_id: str = Field(description="ID of the agent's owner.")
     mode: AgentMode = Field(default=AgentMode.SERVERLESS, description="Runtime mode of the agent.")
     spawn_config: SpawnConfig = Field(description="Configuration for spawning agent containers.")
 
@@ -79,7 +78,6 @@ async def register_agent(request: Request, body: RegisterAgentRequest) -> Agent:
         version=body.version,
         url=url,
         port=body.port,
-        owner_id=body.owner_id,
         status=AgentStatus.PENDING,
         mode=body.mode,
         spawn_config=body.spawn_config,
@@ -188,7 +186,6 @@ async def start_agent(request: Request, agent_id: str) -> AgentStatusResponse:
         description=agent.description,
         instruction=agent.spawn_config.instruction,
         tools=agent.spawn_config.tools,
-        owner_id=agent.owner_id,
     )
 
     runtime_manager.spawn_agent(spawn_request)

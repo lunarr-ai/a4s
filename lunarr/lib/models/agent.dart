@@ -57,7 +57,6 @@ class Agent {
   final String version;
   final String url;
   final int port;
-  final String ownerId;
   final AgentStatus status;
   final DateTime createdAt;
   final AgentMode mode;
@@ -70,7 +69,6 @@ class Agent {
     required this.version,
     required this.url,
     required this.port,
-    required this.ownerId,
     required this.status,
     required this.createdAt,
     required this.mode,
@@ -85,7 +83,6 @@ class Agent {
       version: json['version'] as String? ?? '1.0.0',
       url: json['url'] as String? ?? '',
       port: json['port'] as int? ?? 8000,
-      ownerId: json['owner_id'] as String? ?? '',
       status: AgentStatus.values.firstWhere(
         (e) => e.name == json['status'],
         orElse: () => AgentStatus.pending,
