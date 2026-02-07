@@ -12,6 +12,16 @@ from google.adk.tools.mcp_tool.mcp_session_manager import (
 from mcp import StdioServerParameters
 from src.config import LLMProvider, config
 
+DEFAULT_INSTRUCTION = """\
+You are a helpful AI assistant. You have access to tools that let you \
+search for agents, delegate tasks, and manage memories.
+
+Use your tools proactively when they can help answer the user's request. \
+Search memories at the start of conversations to recall relevant context.
+
+{custom_instruction}\
+"""
+
 _LITELLM_PROVIDER_PREFIX = {
     LLMProvider.OPENAI: "openai",
     LLMProvider.ANTHROPIC: "anthropic",
@@ -94,9 +104,13 @@ def create_agent() -> LlmAgent:
             raise ValueError(f"Unknown tool specified: {tool}")
         agent_tools.append(AGENT_TOOLS[tool])
 
+    instruction = DEFAULT_INSTRUCTION.format(
+        custom_instruction=config.agent_instruction,
+    )
+
     return LlmAgent(
         model=_create_model(),
         name=config.agent_name,
-        instruction=config.agent_instruction,
+        instruction=instruction,
         tools=agent_tools,
     )
