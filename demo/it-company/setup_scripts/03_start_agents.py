@@ -8,7 +8,7 @@ import httpx
 
 # Configuration
 API_BASE_URL = "http://localhost:8000/api/v1"
-REGISTERED_AGENTS_PATH = Path(__file__).parent / "registered_agents.json"
+REGISTERED_AGENTS_PATH = Path(__file__).parent.parent / "data/registered_agents.json"
 BATCH_SIZE = 5  # Start agents in batches to avoid overwhelming Docker
 POLL_INTERVAL = 2  # Seconds between status checks
 MAX_WAIT_TIME = 120  # Maximum seconds to wait for agent to start

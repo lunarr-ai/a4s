@@ -8,8 +8,8 @@ import httpx
 
 # Configuration
 API_BASE_URL = "http://localhost:8000/api/v1"
-SEED_DATA_DIR = Path(__file__).parent.parent / "seed_data"
-REGISTERED_AGENTS_PATH = Path(__file__).parent / "registered_agents.json"
+SEED_DATA_DIR = Path(__file__).parent.parent / "data/memory"
+REGISTERED_AGENTS_PATH = Path(__file__).parent.parent / "data/registered_agents.json"
 
 
 def load_registered_agents() -> dict:

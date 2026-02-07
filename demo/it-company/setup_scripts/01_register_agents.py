@@ -7,8 +7,8 @@ import httpx
 
 # Configuration
 API_BASE_URL = "http://localhost:8000/api/v1"
-COMPANY_STRUCTURE_PATH = Path(__file__).parent.parent / "company_structure.json"
-REGISTERED_AGENTS_PATH = Path(__file__).parent / "registered_agents.json"
+COMPANY_STRUCTURE_PATH = Path(__file__).parent.parent / "data/agents.json"
+REGISTERED_AGENTS_PATH = Path(__file__).parent.parent / "data/registered_agents.json"
 
 
 def load_company_structure() -> dict:
@@ -22,7 +22,7 @@ def register_agent(client: httpx.Client, agent_data: dict) -> dict:
 
     Args:
         client: HTTP client.
-        agent_data: Agent configuration from company_structure.json.
+        agent_data: Agent configuration from agents.json.
 
     Returns:
         Registered agent response.
