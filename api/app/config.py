@@ -3,6 +3,8 @@ from enum import Enum
 from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings
 
+from app.models import ModelProvider
+
 
 class LLMProvider(str, Enum):
     OPENAI = "openai"
@@ -29,6 +31,10 @@ class Config(BaseSettings):
     api_base_url: str = "http://localhost:8000"
     agent_gateway_url: str = "http://localhost:8080"
     agent_network: str = "a4s-network"
+    backbone_agent_id: str = "backbone-router"
+    backbone_agent_image: str = "a4s-personal-assistant:latest"
+    backbone_agent_model_provider: ModelProvider = ModelProvider.GOOGLE
+    backbone_agent_model_id: str = "gemini-3-flash-preview"
 
     # Agent runtime
     agent_idle_timeout: int = Field(default=300, description="Idle timeout in seconds")

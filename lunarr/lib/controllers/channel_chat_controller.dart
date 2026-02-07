@@ -11,6 +11,7 @@ class ChannelChatController {
   final List<ChannelChatModel> _channelChatModels = [];
   final TextEditingController _textEditingController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  final ChannelService _channelService = ChannelService();
   String input = '';
   String _input = '';
   List<String> _selectedAgentIds = [];
@@ -58,39 +59,77 @@ class ChannelChatController {
   }
 
   Future<void> addSelection() async {
-    final channelService = ChannelService();
-    final channel = channelService.channelModel;
+    final channel = _channelService.channelModel;
 
-    List<AgentSummary> relevantAgents = [];
-
-    if (channel.id.isNotEmpty) {
-      relevantAgents =
-          await channelService.searchRelevantAgents(channel.id, _input);
+    if (channel.id.isEmpty) {
+      _channelChatModels.add(ChannelChatModel.selectionExample());
+      scroll();
+      return;
     }
 
-    if (relevantAgents.isEmpty) {
-      ChannelChatModel selection = ChannelChatModel.selectionExample();
-      _channelChatModels.add(selection);
-    } else {
-      final agentCards = relevantAgents
-          .map((a) => AgentCardModel(
-                id: a.id,
-                iconString: 'assets/avatars/1.png',
-                name: a.name,
-                distributionList: '',
-                description: a.description,
-                instruction: '',
-                model: '',
-                tools: [],
-                knowledges: [],
-                isSelected: true,
-              ))
+    final chatResponse = await _channelService.sendChannelMessage(
+      channel.id,
+      _input,
+    );
+
+    if (chatResponse == null) {
+      _channelChatModels.add(ChannelChatModel.selectionExample());
+      scroll();
+      return;
+    }
+
+    if (chatResponse.type == ChannelChatResponseType.direct) {
+      _addDirectAnswer(chatResponse.directResponse ?? '');
+      return;
+    }
+
+    if (chatResponse.type == ChannelChatResponseType.candidates &&
+        chatResponse.candidates != null &&
+        chatResponse.candidates!.isNotEmpty) {
+      final agentCards = chatResponse.candidates!
+          .map(
+            (c) => AgentCardModel(
+              id: c.id,
+              iconString: 'assets/avatars/1.png',
+              name: c.name,
+              distributionList: '',
+              description: c.reason,
+              instruction: '',
+              model: '',
+              tools: [],
+              knowledges: [],
+              isSelected: true,
+            ),
+          )
           .toList();
 
       _channelChatModels.add(ChannelChatModel.selection((body: agentCards)));
+    } else {
+      _channelChatModels.add(ChannelChatModel.selectionExample());
     }
 
     scroll();
+  }
+
+  void _addDirectAnswer(String response) {
+    final agentCard = AgentCardModel(
+      id: 'backbone',
+      iconString: 'assets/avatars/1.png',
+      name: 'Assistant',
+      distributionList: '',
+      description: '',
+      instruction: '',
+      model: '',
+      tools: [],
+      knowledges: [],
+      isSelected: false,
+    );
+
+    _channelChatModels.add(
+      ChannelChatModel.answers([(agentCardModel: agentCard, body: response)]),
+    );
+    scroll();
+    _lock = false;
   }
 
   Future<void> addThinkings() async {
@@ -114,39 +153,45 @@ class ChannelChatController {
   }
 
   Future<void> addAnswer() async {
-    final channelService = ChannelService();
-    final channel = channelService.channelModel;
+    final channel = _channelService.channelModel;
 
     if (channel.id.isNotEmpty && _selectedAgentIds.isNotEmpty) {
-      final chatResponse = await channelService.sendChannelMessage(
+      final chatResponse = await _channelService.sendChannelMessage(
         channel.id,
         _input,
-        _selectedAgentIds,
+        agentIds: _selectedAgentIds,
       );
 
-      if (chatResponse != null && chatResponse.results.isNotEmpty) {
-        final agentCards = chatResponse.results
-            .map((r) => AgentCardModel(
-                  id: r.agentId,
-                  iconString: 'assets/avatars/1.png',
-                  name: r.agentName,
-                  distributionList: '',
-                  description: '',
-                  instruction: '',
-                  model: '',
-                  tools: [],
-                  knowledges: [],
-                  isSelected: false,
-                ))
+      if (chatResponse != null &&
+          chatResponse.results != null &&
+          chatResponse.results!.isNotEmpty) {
+        final agentCards = chatResponse.results!
+            .map(
+              (r) => AgentCardModel(
+                id: r.agentId,
+                iconString: 'assets/avatars/1.png',
+                name: r.agentName,
+                distributionList: '',
+                description: '',
+                instruction: '',
+                model: '',
+                tools: [],
+                knowledges: [],
+                isSelected: false,
+              ),
+            )
             .toList();
 
-        final answerModels = chatResponse.results
+        final answerModels = chatResponse.results!
             .asMap()
             .entries
-            .map((entry) => (
-                  agentCardModel: agentCards[entry.key],
-                  body: entry.value.response ?? entry.value.error ?? 'No response',
-                ))
+            .map(
+              (entry) => (
+                agentCardModel: agentCards[entry.key],
+                body:
+                    entry.value.response ?? entry.value.error ?? 'No response',
+              ),
+            )
             .toList();
 
         _channelChatModels.add(ChannelChatModel.answers(answerModels));

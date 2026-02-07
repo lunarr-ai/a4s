@@ -15,6 +15,7 @@ class Config(BaseSettings):
     agent_name: str = "hello_world"
     agent_id: str = ""
     agent_tools: str = ""
+    agent_mcp_tool_filter: str = ""
 
     agent_model_provider: LLMProvider = LLMProvider.GOOGLE
     agent_model_id: str = "gemini-3-flash-preview"

@@ -56,18 +56,24 @@ class AgentChatController {
 
   Future<void> addSelection() async {
     final agentService = AgentService();
-    final agents = agentService.agents;
+
+    var agents = await agentService.searchAgents(_input);
+    if (agents.isEmpty) {
+      agents = agentService.agents;
+    }
 
     List<AgentCardModel> agentCards;
     if (agents.isNotEmpty) {
       agentCards = agents
           .asMap()
           .entries
-          .map((e) => AgentCardModel.fromAgent(
-                e.value,
-                isSelected: e.key == 0,
-                avatarIndex: (e.key % 30) + 1,
-              ))
+          .map(
+            (e) => AgentCardModel.fromAgent(
+              e.value,
+              isSelected: e.key == 0,
+              avatarIndex: (e.key % 30) + 1,
+            ),
+          )
           .toList();
       _selectedAgentId = agents.first.id;
     } else {
@@ -103,7 +109,10 @@ class AgentChatController {
       final agent = agentService.getAgentById(_selectedAgentId!);
       if (agent != null) {
         agentCardModel = AgentCardModel.fromAgent(agent, isSelected: false);
-        responseText = await agentService.sendMessage(_selectedAgentId!, _input);
+        responseText = await agentService.sendMessage(
+          _selectedAgentId!,
+          _input,
+        );
       } else {
         agentCardModel = AgentCardModel.seungho(false);
       }

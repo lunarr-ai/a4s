@@ -13,3 +13,4 @@ class SpawnAgentRequest(BaseModel):
     description: str = Field(description="The description of the agent for human.")
     instruction: str = Field(description="The additional instruction of the agent.")
     tools: list[str] = Field(description="The enabled tools of the agent.")
+    mcp_tool_filter: str = Field(default="", description="Comma-separated MCP tool names to expose.")

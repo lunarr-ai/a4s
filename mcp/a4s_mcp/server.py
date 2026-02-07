@@ -1,7 +1,7 @@
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 import httpx
 from a2a.client import A2AClient
@@ -47,6 +47,7 @@ async def search_agents(
     ctx: Context[ServerSession, AppContext],
     query: str,
     limit: int = 10,
+    channel_id: str | None = None,
 ) -> dict:
     """Search for agents by name, description, or capability.
 
@@ -56,9 +57,20 @@ async def search_agents(
     Args:
         query: Search query (e.g., "code review").
         limit: Max results (default 10).
+        channel_id: Optional channel ID to scope search to channel members.
     """
     client = ctx.request_context.lifespan_context.client
-    resp = await client.get("/api/v1/agents/search", params={"query": query, "limit": limit})
+    if channel_id:
+        try:
+            UUID(channel_id)
+        except ValueError as err:
+            raise ToolError(f"Invalid channel_id format: {channel_id}") from err
+        resp = await client.get(
+            f"/api/v1/channels/{channel_id}/agents/search",
+            params={"query": query, "limit": limit},
+        )
+    else:
+        resp = await client.get("/api/v1/agents/search", params={"query": query, "limit": limit})
     resp.raise_for_status()
     data = resp.json()
     return {
@@ -72,6 +84,7 @@ async def send_a2a_message(  # noqa: C901
     ctx: Context[ServerSession, AppContext],
     agent_id: str,
     message: str,
+    depth: int = 1,
 ) -> dict:
     """Send a message to an agent via A2A protocol.
 
@@ -84,6 +97,7 @@ async def send_a2a_message(  # noqa: C901
     Args:
         agent_id: Agent ID from search_agents.
         message: Text message to send.
+        depth: Current message depth for tracking delegation chains.
     """
     api_client = ctx.request_context.lifespan_context.client
     resp = await api_client.get(f"/api/v1/agents/{agent_id}")
@@ -104,6 +118,7 @@ async def send_a2a_message(  # noqa: C901
             role="user",
             parts=[TextPart(text=message)],
             message_id=str(uuid4()),
+            metadata={"depth": depth + 1},
         )
         payload = MessageSendParams(
             message=msg,

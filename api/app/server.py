@@ -1,3 +1,4 @@
+import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
@@ -17,12 +18,15 @@ from app.broker.qdrant_registry import QdrantAgentRegistry
 from app.broker.sqlite_channel_registry import SqliteChannelRegistry
 from app.config import config
 from app.memory.factory import create_memory_manager
+from app.models import Agent, AgentMode, AgentModel, AgentStatus, SpawnConfig
 from app.routers import health_router, v1_router
 from app.runtime.agent_scheduler import AgentScheduler
 from app.runtime.docker_manager import DockerRuntimeManager
 from app.runtime.exceptions import AgentNotFoundError, AgentSpawnError, ImageNotFoundError
 from app.skills import exceptions as skills_exc
 from app.skills.sqlite_registry import SqliteSkillsRegistry
+
+logger = logging.getLogger(__name__)
 
 fastapi_app = FastAPI(title="A4S API")
 
@@ -107,6 +111,40 @@ async def channel_registry_error_handler(_request: Request, exc: ChannelRegistry
     return JSONResponse(status_code=500, content={"detail": str(exc)})
 
 
+async def _ensure_backbone_agent(registry: QdrantAgentRegistry) -> None:
+    agent_id = config.backbone_agent_id
+    try:
+        await registry.get_agent(agent_id)
+        logger.info("Backbone agent %s already registered", agent_id)
+        return
+    except AgentNotRegisteredError:
+        pass
+
+    container_name = f"a4s-agent-{agent_id}"
+    agent = Agent(
+        id=agent_id,
+        name="backbone-router",
+        description="Routes user messages to the most relevant agents in a channel",
+        version="1.0.0",
+        url=f"http://{container_name}:8000",
+        port=8000,
+        status=AgentStatus.PENDING,
+        mode=AgentMode.PERMANENT,
+        spawn_config=SpawnConfig(
+            image=config.backbone_agent_image,
+            model=AgentModel(
+                provider=config.backbone_agent_model_provider,
+                model_id=config.backbone_agent_model_id,
+            ),
+            instruction="Instruction managed via container environment",
+            tools=[],
+            mcp_tool_filter="search_agents,send_a2a_message",
+        ),
+    )
+    await registry.register_agent(agent)
+    logger.info("Registered backbone agent %s", agent_id)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     registry = QdrantAgentRegistry(
@@ -135,6 +173,8 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     app.state.channel_registry = channel_registry
     app.state.memory_manager = memory_manager
     app.state.agent_scheduler = agent_scheduler
+
+    await _ensure_backbone_agent(registry)
 
     try:
         yield

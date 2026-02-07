@@ -30,45 +30,45 @@ class ChannelModel {
   String get iconString => '';
 
   Widget getIcon(double radius) => CircleAvatar(
-        radius: radius,
-        backgroundColor: Colors.transparent,
-        child: const Text('#'),
-      );
+    radius: radius,
+    backgroundColor: Colors.transparent,
+    child: const Text('#'),
+  );
 
   static ChannelModel all() => ChannelModel(
-        id: 'all',
-        name: 'All',
-        description: 'All agents',
-        ownerId: 'system',
-      );
+    id: 'all',
+    name: 'All',
+    description: 'All agents',
+    ownerId: 'system',
+  );
 
   static ChannelModel frontendTeam() => ChannelModel(
-        id: 'frontend-team',
-        name: 'Frontend Team',
-        description: 'Frontend development agents',
-        ownerId: 'system',
-      );
+    id: 'frontend-team',
+    name: 'Frontend Team',
+    description: 'Frontend development agents',
+    ownerId: 'system',
+  );
 
   static ChannelModel backendTeam() => ChannelModel(
-        id: 'backend-team',
-        name: 'Backend Team',
-        description: 'Backend development agents',
-        ownerId: 'system',
-      );
+    id: 'backend-team',
+    name: 'Backend Team',
+    description: 'Backend development agents',
+    ownerId: 'system',
+  );
 
   static ChannelModel developers() => ChannelModel(
-        id: 'developers',
-        name: 'Developers',
-        description: 'All developer agents',
-        ownerId: 'system',
-      );
+    id: 'developers',
+    name: 'Developers',
+    description: 'All developer agents',
+    ownerId: 'system',
+  );
 
   static ChannelModel lunchGroup() => ChannelModel(
-        id: 'lunch-group',
-        name: 'Lunch Group',
-        description: 'Lunch coordination agents',
-        ownerId: 'system',
-      );
+    id: 'lunch-group',
+    name: 'Lunch Group',
+    description: 'Lunch coordination agents',
+    ownerId: 'system',
+  );
 }
 
 class ChannelListResponse {
@@ -83,40 +83,6 @@ class ChannelListResponse {
           .map((e) => ChannelModel.fromJson(e as Map<String, dynamic>))
           .toList(),
       total: json['total'] as int? ?? 0,
-    );
-  }
-}
-
-class ChannelAgentSearchResponse {
-  final List<AgentSummary> agents;
-
-  ChannelAgentSearchResponse({required this.agents});
-
-  factory ChannelAgentSearchResponse.fromJson(Map<String, dynamic> json) {
-    return ChannelAgentSearchResponse(
-      agents: (json['agents'] as List<dynamic>)
-          .map((e) => AgentSummary.fromJson(e as Map<String, dynamic>))
-          .toList(),
-    );
-  }
-}
-
-class AgentSummary {
-  final String id;
-  final String name;
-  final String description;
-
-  AgentSummary({
-    required this.id,
-    required this.name,
-    required this.description,
-  });
-
-  factory AgentSummary.fromJson(Map<String, dynamic> json) {
-    return AgentSummary(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      description: json['description'] as String? ?? '',
     );
   }
 }
@@ -144,16 +110,57 @@ class AgentChatResult {
   }
 }
 
-class ChannelChatResponse {
-  final List<AgentChatResult> results;
+enum ChannelChatResponseType { candidates, direct, results }
 
-  ChannelChatResponse({required this.results});
+class CandidateAgent {
+  final String id;
+  final String name;
+  final String reason;
+
+  CandidateAgent({required this.id, required this.name, this.reason = ''});
+
+  factory CandidateAgent.fromJson(Map<String, dynamic> json) {
+    return CandidateAgent(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      reason: json['reason'] as String? ?? '',
+    );
+  }
+}
+
+class ChannelChatResponse {
+  final ChannelChatResponseType type;
+  final List<CandidateAgent>? candidates;
+  final String? directResponse;
+  final List<AgentChatResult>? results;
+
+  ChannelChatResponse({
+    required this.type,
+    this.candidates,
+    this.directResponse,
+    this.results,
+  });
 
   factory ChannelChatResponse.fromJson(Map<String, dynamic> json) {
+    final typeStr = json['type'] as String;
+    final type = ChannelChatResponseType.values.firstWhere(
+      (e) => e.name == typeStr,
+      orElse: () => ChannelChatResponseType.results,
+    );
+
     return ChannelChatResponse(
-      results: (json['results'] as List<dynamic>)
-          .map((e) => AgentChatResult.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      type: type,
+      candidates: json['candidates'] != null
+          ? (json['candidates'] as List<dynamic>)
+                .map((e) => CandidateAgent.fromJson(e as Map<String, dynamic>))
+                .toList()
+          : null,
+      directResponse: json['direct_response'] as String?,
+      results: json['results'] != null
+          ? (json['results'] as List<dynamic>)
+                .map((e) => AgentChatResult.fromJson(e as Map<String, dynamic>))
+                .toList()
+          : null,
     );
   }
 }
