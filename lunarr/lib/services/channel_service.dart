@@ -64,41 +64,22 @@ class ChannelService {
     }
   }
 
-  Future<List<AgentSummary>> searchRelevantAgents(
-      String channelId, String query) async {
-    try {
-      final uri = Uri.parse(
-          '$_baseUrl/api/v1/channels/$channelId/agents/search?query=${Uri.encodeComponent(query)}');
-      final response = await http.get(uri);
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body) as Map<String, dynamic>;
-        final searchResponse = ChannelAgentSearchResponse.fromJson(data);
-        return searchResponse.agents;
-      }
-      log('Failed to search agents: ${response.statusCode}');
-    } catch (e) {
-      log('Error searching agents: $e');
-    }
-    return [];
-  }
-
   Future<ChannelChatResponse?> sendChannelMessage(
     String channelId,
-    String message,
-    List<String> agentIds,
-  ) async {
+    String message, {
+    List<String>? agentIds,
+  }) async {
     try {
       final uri = Uri.parse('$_baseUrl/api/v1/channels/$channelId/chat');
-      final body = jsonEncode({
-        'message': message,
-        'agent_ids': agentIds,
-      });
+      final payload = <String, dynamic>{'message': message};
+      if (agentIds != null) {
+        payload['agent_ids'] = agentIds;
+      }
 
       final response = await http.post(
         uri,
         headers: {'Content-Type': 'application/json'},
-        body: body,
+        body: jsonEncode(payload),
       );
 
       if (response.statusCode == 200) {

@@ -98,6 +98,7 @@ class DockerRuntimeManager(RuntimeManager):
                 "AGENT_MODEL_ID": request.model.model_id,
                 "AGENT_INSTRUCTION": request.instruction,
                 "AGENT_TOOLS": ",".join(request.tools),
+                "AGENT_MCP_TOOL_FILTER": request.mcp_tool_filter,
                 "A4S_API_URL": self._api_base_url,
                 "A4S_AGENT_URL": f"{self._agent_gateway_url}/agents/{request.agent_id}/",
             }

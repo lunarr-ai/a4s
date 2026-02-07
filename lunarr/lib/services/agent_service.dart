@@ -38,7 +38,10 @@ class AgentService {
         _agentModels = _agents
             .asMap()
             .entries
-            .map((e) => AgentModel.fromAgent(e.value, avatarIndex: (e.key % 30) + 1))
+            .map(
+              (e) =>
+                  AgentModel.fromAgent(e.value, avatarIndex: (e.key % 30) + 1),
+            )
             .toList();
 
         if (_agentModels!.isNotEmpty) {
@@ -68,6 +71,25 @@ class AgentService {
     if (_agentModels != null && index < _agentModels!.length) {
       _agentModel = _agentModels![index];
     }
+  }
+
+  Future<List<Agent>> searchAgents(String query, {int limit = 5}) async {
+    try {
+      final uri = Uri.parse(
+        '$_baseUrl/api/v1/agents/search?query=${Uri.encodeComponent(query)}&limit=$limit',
+      );
+      final response = await http.get(uri);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        final searchResponse = AgentSearchResponse.fromJson(data);
+        return searchResponse.agents;
+      }
+      log('Failed to search agents: ${response.statusCode}');
+    } catch (e) {
+      log('Error searching agents: $e');
+    }
+    return [];
   }
 
   Agent? getAgentById(String id) {
@@ -108,11 +130,11 @@ class AgentService {
           'message': {
             'role': 'user',
             'parts': [
-              {'kind': 'text', 'text': message}
+              {'kind': 'text', 'text': message},
             ],
             'messageId': messageId,
           },
-        }
+        },
       });
 
       final response = await http.post(
@@ -141,7 +163,8 @@ class AgentService {
     final artifacts = result['artifacts'] as List<dynamic>?;
     if (artifacts != null) {
       for (final artifact in artifacts) {
-        final parts = (artifact as Map<String, dynamic>)['parts'] as List<dynamic>?;
+        final parts =
+            (artifact as Map<String, dynamic>)['parts'] as List<dynamic>?;
         if (parts != null) {
           for (final part in parts) {
             final text = (part as Map<String, dynamic>)['text'] as String?;

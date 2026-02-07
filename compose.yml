@@ -98,6 +98,61 @@ services:
     networks:
       - a4s-network
 
+  a4s-backbone:
+    container_name: a4s-agent-backbone-router
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: agents/personal-assistant/Dockerfile
+    env_file:
+      - api/.env
+    environment:
+      AGENT_NAME: backbone_router
+      AGENT_ID: backbone-router
+      AGENT_HOST: a4s-agent-backbone-router
+      AGENT_MCP_TOOL_FILTER: search_agents,send_a2a_message
+      AGENT_MODEL_PROVIDER: ${BACKBONE_AGENT_MODEL_PROVIDER:-openrouter}
+      AGENT_MODEL_ID: ${BACKBONE_AGENT_MODEL_ID:-google/gemini-3-flash-preview}
+      AGENT_TOOLS: ""
+      A4S_API_URL: http://a4s-api:8000
+      A4S_AGENT_URL: http://a4s-gateway:8080/agents/backbone-router/
+      AGENT_INSTRUCTION: |
+        You are a routing agent for channels. You receive user messages with channel context.
+
+        PHASE 1 - ROUTING:
+        When you receive a message with available agents listed:
+        1. Analyze the user's message
+        2. Call search_agents with the user's query AND the channel_id provided in context
+        3. Return ONLY a JSON object: {"candidates": [{"id": "...", "name": "...", "reason": "..."}]}
+        4. If no agents are relevant and you can answer directly, respond with plain text
+
+        PHASE 2 - FORWARDING:
+        When you receive a message with approved agent IDs:
+        1. Call send_a2a_message for EACH approved agent in a single turn (parallel tool calls)
+        2. Return ONLY the tool results as-is (do not summarize or modify)
+
+        Response format rules:
+        - For routing: always return {"candidates": [...]} as raw JSON, no markdown
+        - For forwarding: always return {"results": [...]} as raw JSON, no markdown
+        - For direct answers: return plain text only
+    depends_on:
+      a4s-api:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - a4s-network
+
 networks:
   a4s-network:
     name: a4s-network

@@ -4,6 +4,7 @@ from fastapi import APIRouter, Query, Request
 from fastapi.responses import Response
 from pydantic import BaseModel, Field
 
+from app.config import config as app_config
 from app.models import Agent, AgentMode, AgentStatus, SpawnConfig
 from app.runtime.models import SpawnAgentRequest
 from app.utils import generate_agent_id
@@ -142,6 +143,9 @@ async def search_agents(
     """
     registry: AgentRegistry = request.app.state.registry
     agents = await registry.search_agents(query, limit=limit)
+    backbone_id = app_config.backbone_agent_id
+    if backbone_id:
+        agents = [a for a in agents if a.id != backbone_id]
     return AgentSearchResponse(agents=agents, query=query, limit=limit)
 
 
@@ -186,6 +190,7 @@ async def start_agent(request: Request, agent_id: str) -> AgentStatusResponse:
         description=agent.description,
         instruction=agent.spawn_config.instruction,
         tools=agent.spawn_config.tools,
+        mcp_tool_filter=agent.spawn_config.mcp_tool_filter,
     )
 
     runtime_manager.spawn_agent(spawn_request)

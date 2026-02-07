@@ -59,6 +59,7 @@ class SpawnConfig(BaseModel):
     model: AgentModel = Field(description="Model configuration for the agent.")
     instruction: str = Field(default="", description="Instruction for the agent.")
     tools: list[str] = Field(default_factory=list, description="Enabled tools for the agent.")
+    mcp_tool_filter: str = Field(default="", description="Comma-separated MCP tool names to expose.")
 
 
 # Removed owner_id field from Agent model to simplify ownership management.

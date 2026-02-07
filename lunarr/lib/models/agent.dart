@@ -32,12 +32,14 @@ class SpawnConfig {
   final AgentModelConfig model;
   final String instruction;
   final List<String> tools;
+  final String mcpToolFilter;
 
   SpawnConfig({
     required this.image,
     required this.model,
     required this.instruction,
     required this.tools,
+    this.mcpToolFilter = '',
   });
 
   factory SpawnConfig.fromJson(Map<String, dynamic> json) {
@@ -46,6 +48,7 @@ class SpawnConfig {
       model: AgentModelConfig.fromJson(json['model'] as Map<String, dynamic>),
       instruction: json['instruction'] as String? ?? '',
       tools: (json['tools'] as List<dynamic>?)?.cast<String>() ?? [],
+      mcpToolFilter: json['mcp_tool_filter'] as String? ?? '',
     );
   }
 }
@@ -88,7 +91,8 @@ class Agent {
         orElse: () => AgentStatus.pending,
       ),
       createdAt: DateTime.parse(
-          json['created_at'] as String? ?? DateTime.now().toIso8601String()),
+        json['created_at'] as String? ?? DateTime.now().toIso8601String(),
+      ),
       mode: AgentMode.values.firstWhere(
         (e) => e.name == json['mode'],
         orElse: () => AgentMode.serverless,
@@ -121,6 +125,28 @@ class AgentListResponse {
       offset: json['offset'] as int? ?? 0,
       limit: json['limit'] as int? ?? 50,
       total: json['total'] as int? ?? 0,
+    );
+  }
+}
+
+class AgentSearchResponse {
+  final List<Agent> agents;
+  final String query;
+  final int limit;
+
+  AgentSearchResponse({
+    required this.agents,
+    required this.query,
+    required this.limit,
+  });
+
+  factory AgentSearchResponse.fromJson(Map<String, dynamic> json) {
+    return AgentSearchResponse(
+      agents: (json['agents'] as List<dynamic>)
+          .map((e) => Agent.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      query: json['query'] as String? ?? '',
+      limit: json['limit'] as int? ?? 10,
     );
   }
 }
