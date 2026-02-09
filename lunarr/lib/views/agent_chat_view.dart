@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:lunarr/controllers/agent_chat_controller.dart';
+import 'package:lunarr/models/agent_card_model.dart';
 import 'package:lunarr/models/agent_chat_model.dart';
-import 'package:lunarr/models/agent_model.dart';
 import 'package:lunarr/models/chat_model.dart';
-import 'package:lunarr/services/agent_service.dart';
+import 'package:lunarr/services/agent_card_service.dart';
 
 class AgentChatView extends StatefulWidget {
   final String agentId;
@@ -171,7 +171,7 @@ class _AgentChatViewState extends State<AgentChatView> {
   }
 
   Widget _buildInput(ColorScheme cs, TextTheme tt) {
-    final AgentModel am = AgentService().agentModel;
+    final AgentCardModel acm = AgentCardService().agentCardModel;
     return Align(
       alignment: Alignment.bottomCenter,
       child: Padding(
@@ -211,7 +211,7 @@ class _AgentChatViewState extends State<AgentChatView> {
                         acc.input = value;
                       },
                       decoration: InputDecoration(
-                        hintText: 'Ask ${am.labelString}',
+                        hintText: 'Ask ${acm.name}',
                         hintStyle: tt.bodyLarge?.copyWith(
                           color: cs.onSurfaceVariant,
                         ),
@@ -282,7 +282,7 @@ class _AgentChatViewState extends State<AgentChatView> {
   }
 
   Widget _buildAppBar(TextTheme tt, ColorScheme cs) {
-    final AgentModel am = AgentService().agentModel;
+    final AgentCardModel acm = AgentCardService().agentCardModel;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 12, 8),
       child: Row(
@@ -291,9 +291,9 @@ class _AgentChatViewState extends State<AgentChatView> {
           Row(
             spacing: 12,
             children: [
-              am.getIcon(16),
+              acm.getIcon(16),
               Text(
-                am.labelString,
+                acm.name,
                 style: tt.titleLarge?.copyWith(color: cs.onSurface),
               ),
             ],

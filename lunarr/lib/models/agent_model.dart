@@ -1,30 +1,152 @@
-import 'package:flutter/material.dart';
-import 'package:lunarr/models/agent.dart';
+enum AgentStatus { pending, running, stopped, error }
 
-class AgentModel {
-  final String id;
-  final String iconString;
-  final String labelString;
-  final Agent? agent;
+enum AgentMode { serverless, permanent }
 
-  AgentModel(this.iconString, this.labelString, {this.id = '', this.agent});
+enum ModelProvider { openai, anthropic, google, openrouter }
 
-  Widget getIcon(double radius) =>
-      CircleAvatar(radius: radius, child: Text(agent!.name[0].toUpperCase()));
+class AgentModelConfig {
+  final ModelProvider provider;
+  final String modelId;
 
-  factory AgentModel.fromAgent(Agent agent, {int avatarIndex = 1}) {
-    return AgentModel(
-      'assets/avatars/$avatarIndex.png',
-      agent.name,
-      id: agent.id,
-      agent: agent,
+  AgentModelConfig({required this.provider, required this.modelId});
+
+  factory AgentModelConfig.fromJson(Map<String, dynamic> json) {
+    return AgentModelConfig(
+      provider: ModelProvider.values.firstWhere(
+        (e) => e.name == json['provider'],
+        orElse: () => ModelProvider.google,
+      ),
+      modelId: json['model_id'] as String? ?? '',
     );
   }
 
-  static AgentModel seungho() =>
-      AgentModel('assets/avatars/1.png', 'Seungho\'s Agent');
-  static AgentModel kyungho() =>
-      AgentModel('assets/avatars/2.png', 'Kyungho\'s Agent');
-  static AgentModel minseok() =>
-      AgentModel('assets/avatars/4.png', 'Minseok\'s Agent');
+  String get displayName {
+    final providerName =
+        provider.name[0].toUpperCase() + provider.name.substring(1);
+    return '$providerName $modelId';
+  }
+}
+
+class SpawnConfig {
+  final String image;
+  final AgentModelConfig model;
+  final String instruction;
+  final List<String> tools;
+  final String mcpToolFilter;
+
+  SpawnConfig({
+    required this.image,
+    required this.model,
+    required this.instruction,
+    required this.tools,
+    this.mcpToolFilter = '',
+  });
+
+  factory SpawnConfig.fromJson(Map<String, dynamic> json) {
+    return SpawnConfig(
+      image: json['image'] as String? ?? '',
+      model: AgentModelConfig.fromJson(json['model'] as Map<String, dynamic>),
+      instruction: json['instruction'] as String? ?? '',
+      tools: (json['tools'] as List<dynamic>?)?.cast<String>() ?? [],
+      mcpToolFilter: json['mcp_tool_filter'] as String? ?? '',
+    );
+  }
+}
+
+class AgentModel {
+  final String id;
+  final String name;
+  final String description;
+  final String version;
+  final String url;
+  final int port;
+  final AgentStatus status;
+  final DateTime createdAt;
+  final AgentMode mode;
+  final SpawnConfig? spawnConfig;
+
+  AgentModel({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.version,
+    required this.url,
+    required this.port,
+    required this.status,
+    required this.createdAt,
+    required this.mode,
+    this.spawnConfig,
+  });
+
+  factory AgentModel.fromJson(Map<String, dynamic> json) {
+    return AgentModel(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      description: json['description'] as String? ?? '',
+      version: json['version'] as String? ?? '1.0.0',
+      url: json['url'] as String? ?? '',
+      port: json['port'] as int? ?? 8000,
+      status: AgentStatus.values.firstWhere(
+        (e) => e.name == json['status'],
+        orElse: () => AgentStatus.pending,
+      ),
+      createdAt: DateTime.parse(
+        json['created_at'] as String? ?? DateTime.now().toIso8601String(),
+      ),
+      mode: AgentMode.values.firstWhere(
+        (e) => e.name == json['mode'],
+        orElse: () => AgentMode.serverless,
+      ),
+      spawnConfig: json['spawn_config'] != null
+          ? SpawnConfig.fromJson(json['spawn_config'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+}
+
+class AgentListResponse {
+  final List<AgentModel> agents;
+  final int offset;
+  final int limit;
+  final int total;
+
+  AgentListResponse({
+    required this.agents,
+    required this.offset,
+    required this.limit,
+    required this.total,
+  });
+
+  factory AgentListResponse.fromJson(Map<String, dynamic> json) {
+    return AgentListResponse(
+      agents: (json['agents'] as List<dynamic>)
+          .map((e) => AgentModel.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      offset: json['offset'] as int? ?? 0,
+      limit: json['limit'] as int? ?? 50,
+      total: json['total'] as int? ?? 0,
+    );
+  }
+}
+
+class AgentSearchResponse {
+  final List<AgentModel> agents;
+  final String query;
+  final int limit;
+
+  AgentSearchResponse({
+    required this.agents,
+    required this.query,
+    required this.limit,
+  });
+
+  factory AgentSearchResponse.fromJson(Map<String, dynamic> json) {
+    return AgentSearchResponse(
+      agents: (json['agents'] as List<dynamic>)
+          .map((e) => AgentModel.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      query: json['query'] as String? ?? '',
+      limit: json['limit'] as int? ?? 10,
+    );
+  }
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lunarr/constants/colors.dart';
+import 'package:lunarr/services/agent_card_service.dart';
+import 'package:lunarr/services/channel_service.dart';
 import 'package:lunarr/services/user_service.dart';
 import 'package:lunarr/views/main_view.dart';
 import 'package:lunarr/widgets/emblem_widget.dart';
@@ -49,7 +51,10 @@ class _SignDemoViewState extends State<SignDemoView> {
                       controller: usernameController,
                       onChanged: (value) => UserService().username = value,
                       decoration: InputDecoration(labelText: 'Username'),
-                      onSubmitted: (_) {
+                      onSubmitted: (_) async {
+                        await ChannelService().fetchChannelModels();
+                        await AgentCardService().fetchAgentCardModels();
+
                         Navigator.of(context).pushReplacement(
                           MaterialPageRoute(builder: (context) => MainView()),
                         );
@@ -61,6 +66,9 @@ class _SignDemoViewState extends State<SignDemoView> {
                         Expanded(
                           child: FilledButton(
                             onPressed: () async {
+                              await ChannelService().fetchChannelModels();
+                              await AgentCardService().fetchAgentCardModels();
+
                               Navigator.of(context).pushReplacement(
                                 MaterialPageRoute(
                                   builder: (context) => MainView(),

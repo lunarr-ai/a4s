@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:lunarr/models/agent_model.dart';
+import 'package:lunarr/models/agent_card_model.dart';
 import 'package:lunarr/models/channel_model.dart';
-import 'package:lunarr/services/agent_service.dart';
+import 'package:lunarr/services/agent_card_service.dart';
 import 'package:lunarr/services/channel_service.dart';
 import 'package:lunarr/services/user_service.dart';
 import 'package:lunarr/views/agent_chat_view.dart';
@@ -21,8 +21,9 @@ class _MainViewState extends State<MainView> {
   Widget build(BuildContext context) {
     ColorScheme cs = Theme.of(context).colorScheme;
     TextTheme tt = Theme.of(context).textTheme;
-    final List<ChannelModel> channelModels = ChannelService().channelModels!;
-    final List<AgentModel> agentModels = AgentService().agentModels!;
+    final List<ChannelModel> channelModels = ChannelService().channelModels;
+    final List<AgentCardModel> agentCardModels =
+        AgentCardService().agentCardModels;
     final int channelCount = channelModels.length;
 
     return Scaffold(
@@ -33,7 +34,7 @@ class _MainViewState extends State<MainView> {
             cs,
             tt,
             channelModels,
-            agentModels,
+            agentCardModels,
             channelCount,
           ),
           Expanded(
@@ -41,7 +42,7 @@ class _MainViewState extends State<MainView> {
                 ? ChannelChatView(key: ValueKey(_selectedIndex))
                 : AgentChatView(
                     key: ValueKey(_selectedIndex - channelCount),
-                    agentId: agentModels[_selectedIndex - channelCount].id,
+                    agentId: agentCardModels[_selectedIndex - channelCount].id,
                   ),
           ),
         ],
@@ -53,7 +54,7 @@ class _MainViewState extends State<MainView> {
     ColorScheme cs,
     TextTheme tt,
     List<ChannelModel> channelModels,
-    List<AgentModel> agentModels,
+    List<AgentCardModel> agentCardModels,
     int channelCount,
   ) {
     return Container(
@@ -68,7 +69,7 @@ class _MainViewState extends State<MainView> {
           if (index < channelCount) {
             ChannelService().fetchChannelModel(index);
           } else {
-            AgentService().fetchAgentModel(index - channelCount);
+            AgentCardService().fetchAgentCardModel(index - channelCount);
           }
         },
         header: Row(
@@ -155,10 +156,10 @@ class _MainViewState extends State<MainView> {
               ),
             ),
           ),
-          ...agentModels.map(
-            (agentModel) => NavigationDrawerDestination(
-              icon: agentModel.getIcon(12),
-              label: Text(agentModel.labelString),
+          ...agentCardModels.map(
+            (agentCardModel) => NavigationDrawerDestination(
+              icon: agentCardModel.getIcon(12),
+              label: Text(agentCardModel.name),
             ),
           ),
         ],

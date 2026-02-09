@@ -19,7 +19,7 @@ class ChannelService {
   List<ChannelModel>? _channelModels;
   ChannelModel? _channelModel;
 
-  List<ChannelModel>? get channelModels => _channelModels;
+  List<ChannelModel> get channelModels => _channelModels ?? [];
   ChannelModel get channelModel =>
       _channelModel ??
       ChannelModel(id: '', name: '', description: '', ownerId: '');

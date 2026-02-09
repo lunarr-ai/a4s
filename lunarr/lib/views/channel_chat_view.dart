@@ -314,12 +314,12 @@ class _ChannelChatViewState extends State<ChannelChatView> {
     );
   }
 
-  Widget _buildAnswers(List<AnswerModel> ams, ColorScheme cs, TextTheme tt) {
+  Widget _buildAnswers(List<AnswerModel> acms, ColorScheme cs, TextTheme tt) {
     final ChannelModel cm = ChannelService().channelModel;
 
     return Column(
       spacing: 24,
-      children: ams.map((am) {
+      children: acms.map((acm) {
         return Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -337,9 +337,9 @@ class _ChannelChatViewState extends State<ChannelChatView> {
                         Row(
                           spacing: 12,
                           children: [
-                            am.agentCardModel.getIcon(12),
+                            acm.agentCardModel.getIcon(12),
                             Text(
-                              am.agentCardModel.name,
+                              acm.agentCardModel.name,
                               style: tt.labelLarge?.copyWith(
                                 color: cs.onSurface,
                                 fontWeight: FontWeight.bold,
@@ -348,7 +348,7 @@ class _ChannelChatViewState extends State<ChannelChatView> {
                           ],
                         ),
                         Text(
-                          am.body,
+                          acm.body,
                           style: tt.bodyLarge?.copyWith(color: cs.onSurface),
                         ),
                       ],

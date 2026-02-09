@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lunarr/models/agent.dart';
+import 'package:lunarr/models/agent_model.dart';
 
 class AgentCardModel {
   final String id;
@@ -30,7 +30,7 @@ class AgentCardModel {
       CircleAvatar(radius: radius, child: Text(name[0].toUpperCase()));
 
   factory AgentCardModel.fromAgent(
-    Agent agent, {
+    AgentModel agent, {
     bool isSelected = false,
     int avatarIndex = 1,
   }) {

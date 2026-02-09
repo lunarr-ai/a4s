@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:lunarr/models/agent_card_model.dart';
 import 'package:lunarr/models/agent_chat_model.dart';
-import 'package:lunarr/services/agent_service.dart';
+import 'package:lunarr/services/agent_card_service.dart';
 
 class AgentChatController {
   AgentChatController({String? agentId}) : _selectedAgentId = agentId;
@@ -68,7 +68,7 @@ class AgentChatController {
   }
 
   Future<void> addAnswer() async {
-    final agentService = AgentService();
+    final agentService = AgentCardService();
 
     AgentCardModel agentCardModel;
     String? responseText;

@@ -2,31 +2,31 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:http/http.dart' as http;
-import 'package:lunarr/models/agent.dart';
-import 'package:lunarr/models/agent_card_model.dart';
 import 'package:lunarr/models/agent_model.dart';
+import 'package:lunarr/models/agent_card_model.dart';
 
 const _baseUrl = String.fromEnvironment(
   'API_BASE_URL',
   defaultValue: 'http://localhost:8080',
 );
 
-class AgentService {
-  AgentService._internal();
+class AgentCardService {
+  AgentCardService._internal();
 
-  static final AgentService _instance = AgentService._internal();
+  static final AgentCardService _instance = AgentCardService._internal();
 
-  factory AgentService() => _instance;
+  factory AgentCardService() => _instance;
 
-  List<Agent> _agents = [];
-  List<AgentModel>? _agentModels;
-  AgentModel? _agentModel;
+  List<AgentModel> _agents = [];
+  List<AgentCardModel>? _agentCardModels;
+  AgentCardModel? _agentCardModel;
 
-  List<Agent> get agents => _agents;
-  List<AgentModel>? get agentModels => _agentModels;
-  AgentModel get agentModel => _agentModel ?? AgentModel('', '');
+  List<AgentModel> get agents => _agents;
+  List<AgentCardModel> get agentCardModels => _agentCardModels ?? [];
+  AgentCardModel get agentCardModel =>
+      _agentCardModel ?? AgentCardModel.seungho(false);
 
-  Future<void> fetchAgentModels() async {
+  Future<void> fetchAgentCardModels() async {
     try {
       final uri = Uri.parse('$_baseUrl/api/v1/agents');
       final response = await http.get(uri);
@@ -35,17 +35,19 @@ class AgentService {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
         final listResponse = AgentListResponse.fromJson(data);
         _agents = listResponse.agents;
-        _agentModels = _agents
+        _agentCardModels = _agents
             .asMap()
             .entries
             .map(
-              (e) =>
-                  AgentModel.fromAgent(e.value, avatarIndex: (e.key % 30) + 1),
+              (e) => AgentCardModel.fromAgent(
+                e.value,
+                avatarIndex: (e.key % 30) + 1,
+              ),
             )
             .toList();
 
-        if (_agentModels!.isNotEmpty) {
-          fetchAgentModel(0);
+        if (_agentCardModels!.isNotEmpty) {
+          fetchAgentCardModel(0);
         }
         return;
       }
@@ -53,27 +55,15 @@ class AgentService {
     } catch (e) {
       log('Error fetching agents: $e');
     }
-
-    _useMockData();
   }
 
-  void _useMockData() {
-    _agents = [];
-    _agentModels = [
-      AgentModel.seungho(),
-      AgentModel.kyungho(),
-      AgentModel.minseok(),
-    ];
-    fetchAgentModel(0);
-  }
-
-  void fetchAgentModel(int index) {
-    if (_agentModels != null && index < _agentModels!.length) {
-      _agentModel = _agentModels![index];
+  void fetchAgentCardModel(int index) {
+    if (_agentCardModels != null && index < _agentCardModels!.length) {
+      _agentCardModel = _agentCardModels![index];
     }
   }
 
-  Future<List<Agent>> searchAgents(String query, {int limit = 5}) async {
+  Future<List<AgentModel>> searchAgents(String query, {int limit = 5}) async {
     try {
       final uri = Uri.parse(
         '$_baseUrl/api/v1/agents/search?query=${Uri.encodeComponent(query)}&limit=$limit',
@@ -92,7 +82,7 @@ class AgentService {
     return [];
   }
 
-  Agent? getAgentById(String id) {
+  AgentModel? getAgentById(String id) {
     try {
       return _agents.firstWhere((a) => a.id == id);
     } catch (_) {
