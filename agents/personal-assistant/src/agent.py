@@ -78,9 +78,13 @@ def create_agent() -> LlmAgent:
     if config.agent_id:
         mcp_env["REQUESTER_ID"] = config.agent_id
 
+    excluded_mcp_tools = {"send_a2a_message"}
+
     mcp_kwargs = {}
     if config.agent_mcp_tool_filter:
         mcp_kwargs["tool_filter"] = config.agent_mcp_tool_filter.split(",")
+    else:
+        mcp_kwargs["tool_filter"] = lambda tool, _: tool.name not in excluded_mcp_tools
 
     agent_tools = [
         McpToolset(
