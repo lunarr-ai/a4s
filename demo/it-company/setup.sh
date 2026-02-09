@@ -3,8 +3,8 @@ set -euo pipefail
 
 API_URL="${API_URL:-http://localhost:8080}"
 IMAGE="${IMAGE:-a4s-personal-assistant:latest}"
-MODEL_PROVIDER="${MODEL_PROVIDER:-openrouter}"
-MODEL_ID="${MODEL_ID:-google/gemini-3-flash-preview}"
+MODEL_PROVIDER="${MODEL_PROVIDER:-google}"
+MODEL_ID="${MODEL_ID:-gemini-3-flash-preview}"
 MEMORY_DELAY="${MEMORY_DELAY:-2}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

@@ -90,8 +90,8 @@ services:
       AGENT_ID: backbone-router
       AGENT_HOST: a4s-agent-backbone-router
       AGENT_MCP_TOOL_FILTER: search_agents,send_a2a_message
-      AGENT_MODEL_PROVIDER: ${BACKBONE_AGENT_MODEL_PROVIDER:-openrouter}
-      AGENT_MODEL_ID: ${BACKBONE_AGENT_MODEL_ID:-google/gemini-3-flash-preview}
+      AGENT_MODEL_PROVIDER: ${BACKBONE_AGENT_MODEL_PROVIDER:-google}
+      AGENT_MODEL_ID: ${BACKBONE_AGENT_MODEL_ID:-gemini-3-flash-preview}
       AGENT_TOOLS: ""
       A4S_API_URL: http://a4s-api:8000
       A4S_AGENT_URL: http://a4s-gateway:8080/agents/backbone-router/
