@@ -21,21 +21,6 @@ class AgentChatModel {
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
   ));
 
-  AgentChatModel.selection(this.selectionModel)
-    : type = AgentChatType.selection,
-      questionModel = null,
-      thinkingModel = null,
-      answerModel = null;
-
-  static AgentChatModel selectionExample() => AgentChatModel.selection((
-    body: [
-      AgentCardModel.seungho(false),
-      AgentCardModel.kyungho(true),
-      AgentCardModel.minseok(true),
-      AgentCardModel.seungho(true),
-    ],
-  ));
-
   AgentChatModel.thinking(this.thinkingModel)
     : type = AgentChatType.thinking,
       questionModel = null,
@@ -65,7 +50,6 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
 
   static List<AgentChatModel> examples(AgentCardModel agentCardModel) => [
     AgentChatModel.questionExample(),
-    AgentChatModel.selectionExample(),
     AgentChatModel.thinkingExample(agentCardModel),
     AgentChatModel.answerExample(agentCardModel),
   ];

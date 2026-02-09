@@ -56,40 +56,6 @@ class AgentChatController {
     scroll();
   }
 
-  Future<void> addSelection() async {
-    final agentService = AgentService();
-
-    var agents = await agentService.searchAgents(_input);
-    if (agents.isEmpty) {
-      agents = agentService.agents;
-    }
-
-    List<AgentCardModel> agentCards;
-    if (agents.isNotEmpty) {
-      agentCards = agents
-          .asMap()
-          .entries
-          .map(
-            (e) => AgentCardModel.fromAgent(
-              e.value,
-              isSelected: e.key == 0,
-              avatarIndex: (e.key % 30) + 1,
-            ),
-          )
-          .toList();
-      _selectedAgentId = agents.first.id;
-    } else {
-      agentCards = [
-        AgentCardModel.seungho(true),
-        AgentCardModel.kyungho(false),
-        AgentCardModel.minseok(false),
-      ];
-    }
-
-    _agentChatModels.add(AgentChatModel.selection((body: agentCards)));
-    scroll();
-  }
-
   // TODO: integrate API (not for now)
   Future<void> addThinking() async {
     AgentCardModel agentCardModel = AgentCardModel.seungho(false);
