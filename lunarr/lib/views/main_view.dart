@@ -40,10 +40,7 @@ class _MainViewState extends State<MainView> {
           Expanded(
             child: _selectedIndex < channelCount
                 ? ChannelChatView(key: ValueKey(_selectedIndex))
-                : AgentChatView(
-                    key: ValueKey(_selectedIndex - channelCount),
-                    agentId: agentCardModels[_selectedIndex - channelCount].id,
-                  ),
+                : AgentChatView(key: ValueKey(_selectedIndex - channelCount)),
           ),
         ],
       ),

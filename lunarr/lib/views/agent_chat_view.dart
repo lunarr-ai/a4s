@@ -6,18 +6,22 @@ import 'package:lunarr/models/chat_model.dart';
 import 'package:lunarr/services/agent_card_service.dart';
 
 class AgentChatView extends StatefulWidget {
-  final String agentId;
-
-  const AgentChatView({super.key, required this.agentId});
+  const AgentChatView({super.key});
 
   @override
   State<AgentChatView> createState() => _AgentChatViewState();
 }
 
 class _AgentChatViewState extends State<AgentChatView> {
-  late final AgentChatController acc = AgentChatController(
-    agentId: widget.agentId,
-  );
+  final AgentChatController acc = AgentChatController();
+
+  late Future<void> initFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    initFuture = acc.fetchAgentChatModels();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,25 +39,33 @@ class _AgentChatViewState extends State<AgentChatView> {
 
   Expanded _buildChat(ColorScheme cs, TextTheme tt) {
     return Expanded(
-      child: SingleChildScrollView(
-        controller: acc.scrollController,
-        padding: EdgeInsets.only(bottom: 212, top: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          spacing: 24,
-          children: [
-            ...acc.agentChatModels.map((acms) {
-              switch (acms.type) {
-                case AgentChatType.question:
-                  return _buildQuestion(acms.questionModel!, cs, tt);
-                case AgentChatType.thinking:
-                  return _buildThinking(acms.thinkingModel!, cs, tt);
-                case AgentChatType.answer:
-                  return _buildAnswer(acms.answerModel!, cs, tt);
-              }
-            }),
-          ],
-        ),
+      child: FutureBuilder(
+        future: initFuture,
+        builder: (context, asyncSnapshot) {
+          if (asyncSnapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+          return SingleChildScrollView(
+            controller: acc.scrollController,
+            padding: EdgeInsets.only(bottom: 212, top: 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              spacing: 24,
+              children: [
+                ...acc.agentChatModels.map((acms) {
+                  switch (acms.type) {
+                    case AgentChatType.question:
+                      return _buildQuestion(acms.questionModel!, cs, tt);
+                    case AgentChatType.thinking:
+                      return _buildThinking(acms.thinkingModel!, cs, tt);
+                    case AgentChatType.answer:
+                      return _buildAnswer(acms.answerModel!, cs, tt);
+                  }
+                }),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
