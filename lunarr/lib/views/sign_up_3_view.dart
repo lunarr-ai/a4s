@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lunarr/services/sign_service.dart';
-import 'package:lunarr/views/workspace_view.dart';
+import 'package:lunarr/views/main_view.dart';
 
 class SignUp3View extends StatefulWidget {
   final void Function(int i) setIndex;
@@ -63,7 +63,7 @@ class _SignUp3ViewState extends State<SignUp3View> {
               child: FilledButton(
                 onPressed: () {
                   Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (context) => WorkspaceView()),
+                    MaterialPageRoute(builder: (context) => MainView()),
                   );
                 },
                 child: Text('Next'),
