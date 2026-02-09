@@ -4,7 +4,10 @@ Lunarr provides your AI stand-in at work. Personal agents learn your context, an
 
 ## Quick Start
 
+Bring your own API Key (Google, OpenAI, OpenRouter, etc) and add one of them in .env.
+
 ```bash
+cp api/.env.example api/.env
 make up
 ```
 
