@@ -73,7 +73,7 @@ class ChannelChatController {
 
     final chatResponse = await _channelService.sendChannelMessage(
       cm.id,
-      _input,
+      _getHistory(),
     );
 
     if (chatResponse == null) {
@@ -165,7 +165,7 @@ class ChannelChatController {
     if (channel.id.isNotEmpty && _selectedAgentIds.isNotEmpty) {
       final chatResponse = await _channelService.sendChannelMessage(
         channel.id,
-        _input,
+        _getHistory(),
         agentIds: _selectedAgentIds,
       );
 
@@ -176,7 +176,7 @@ class ChannelChatController {
             .map(
               (r) => AgentCardModel(
                 id: r.agentId,
-                iconString: 'assets/avatars/1.png',
+                iconString: '',
                 name: r.agentName,
                 distributionList: '',
                 description: '',
@@ -223,5 +223,21 @@ class ChannelChatController {
 
     _lock = false;
     _selectedAgentIds = [];
+  }
+
+  String _getHistory() {
+    return _channelChatModels
+        .map(
+          (ccm) => switch (ccm.type) {
+            ChannelChatType.question => 'User: ${ccm.questionModel!.body}',
+            ChannelChatType.selection =>
+              'Selection: ${ccm.selectionModel!.body.map((acm) => acm.name).join(', ')}',
+            ChannelChatType.thinkings =>
+              'Thinking: ${ccm.thinkingModels!.map((tm) => tm.body).join(', ')}',
+            ChannelChatType.answers =>
+              'Assistant: ${ccm.answerModels!.map((am) => am.body).join(', ')}',
+          },
+        )
+        .join('\n');
   }
 }

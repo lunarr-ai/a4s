@@ -76,12 +76,24 @@ class AgentChatController {
       AgentChatModel.answer((
         agentCardModel: acm,
         body:
-            await _agentCardService.sendMessage(acm.id, _input) ??
+            await _agentCardService.sendMessage(acm.id, _getHistory()) ??
             'Unable to get response from agent.',
       )),
     );
     scroll();
 
     _lock = false;
+  }
+
+  String _getHistory() {
+    return _agentChatModels
+        .map(
+          (acm) => switch (acm.type) {
+            AgentChatType.question => 'User: ${acm.questionModel!.body}',
+            AgentChatType.thinking => 'Thinking: ${acm.thinkingModel!.body}',
+            AgentChatType.answer => 'Assistant: ${acm.answerModel!.body}',
+          },
+        )
+        .join('\n');
   }
 }
