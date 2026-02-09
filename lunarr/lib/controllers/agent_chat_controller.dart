@@ -31,16 +31,16 @@ class AgentChatController {
     });
   }
 
-  // TODO: integrate API (not for now)
+  // TODO
   Future<void> fetchAgentChatModels() async {
-    AgentCardModel agentCardModel = AgentCardModel.seungho(false);
-
     await Future.delayed(const Duration(seconds: 1));
-    List<AgentChatModel> agentChatModels = [
-      for (int i = 0; i < 4; i++) ...AgentChatModel.examples(agentCardModel),
-    ];
 
-    _agentChatModels.addAll(agentChatModels);
+    // AgentCardModel agentCardModel = AgentCardModel.seungho(false);
+    // List<AgentChatModel> agentChatModels = [
+    //   for (int i = 0; i < 4; i++) ...AgentChatModel.examples(agentCardModel),
+    // ];
+    // _agentChatModels.addAll(agentChatModels);
+
     scroll();
   }
 
@@ -56,11 +56,11 @@ class AgentChatController {
     scroll();
   }
 
-  // TODO: integrate API (not for now)
+  // TODO
   Future<void> addThinking() async {
-    AgentCardModel agentCardModel = AgentCardModel.seungho(false);
-
     await Future.delayed(const Duration(seconds: 1));
+
+    AgentCardModel agentCardModel = AgentCardModel.seungho(false);
     AgentChatModel thinking = AgentChatModel.thinkingExample(agentCardModel);
 
     _agentChatModels.add(thinking);

@@ -31,18 +31,20 @@ class ChannelChatController {
     });
   }
 
+  // TODO
   Future<void> fetchChannelChatModels() async {
     await Future.delayed(const Duration(seconds: 1));
-    List<ChannelChatModel> channelChatModels = [
-      for (int i = 0; i < 4; i++)
-        ...ChannelChatModel.examples([
-          AgentCardModel.kyungho(false),
-          AgentCardModel.minseok(false),
-          AgentCardModel.seungho(false),
-        ]),
-    ];
 
-    _channelChatModels.addAll(channelChatModels);
+    // List<ChannelChatModel> channelChatModels = [
+    //   for (int i = 0; i < 4; i++)
+    //     ...ChannelChatModel.examples([
+    //       AgentCardModel.kyungho(false),
+    //       AgentCardModel.minseok(false),
+    //       AgentCardModel.seungho(false),
+    //     ]),
+    // ];
+    // _channelChatModels.addAll(channelChatModels);
+
     scroll();
   }
 
