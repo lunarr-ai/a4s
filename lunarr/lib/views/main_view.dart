@@ -3,6 +3,7 @@ import 'package:lunarr/models/agent_model.dart';
 import 'package:lunarr/models/channel_model.dart';
 import 'package:lunarr/services/agent_service.dart';
 import 'package:lunarr/services/channel_service.dart';
+import 'package:lunarr/services/user_service.dart';
 import 'package:lunarr/views/agent_chat_view.dart';
 import 'package:lunarr/views/channel_chat_view.dart';
 
@@ -71,21 +72,19 @@ class _MainViewState extends State<MainView> {
           }
         },
         header: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Row(
-              spacing: 12,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                CircleAvatar(radius: 16, child: Text('C')),
+                Image.asset('assets/images/logo.png', width: 32, height: 32),
                 Text(
-                  'C Company',
-                  style: tt.titleLarge?.copyWith(color: cs.onSurfaceVariant),
+                  'Lunarr',
+                  style: tt.titleLarge?.copyWith(
+                    color: cs.onSurface,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ],
-            ),
-            IconButton(
-              onPressed: () {},
-              icon: Icon(Icons.arrow_drop_down, color: cs.onSurface),
             ),
           ],
         ),
@@ -97,10 +96,10 @@ class _MainViewState extends State<MainView> {
               children: [
                 CircleAvatar(
                   radius: 16,
-                  child: Image.asset('assets/avatars/8.png'),
+                  child: Text(UserService().username![0].toUpperCase()),
                 ),
                 Text(
-                  'Seungho Jang',
+                  UserService().username!,
                   style: tt.titleLarge?.copyWith(color: cs.onSurfaceVariant),
                 ),
               ],
